@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="ABOAdmin">
+    <output-path>$PROJECT_DIR$/out/artifacts/ABOAdmin</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="ua.spro.ABOAdminApp" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="all" />
+        <option name="title" value="ABO admin" />
+        <option name="vendor" value="SPro" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="ABOAdmin.jar">
+        <element id="module-output" name="ABOAdmin" />
+      </element>
+    </root>
+  </artifact>
+</component>
