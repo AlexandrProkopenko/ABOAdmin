@@ -5,14 +5,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ua.spro.dao.StatusDAO;
 import ua.spro.entity.Status;
+import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
 
 public class StatusDAOImpl implements StatusDAO {
 
-    private static String url = "jdbc:mysql://localhost:3306/abo ?serverTimezone=UTC&useSSL=false";
-    private static String login = "root";
-    private static String password = "1111";
+    private static String url = ConnectionDBUtil.getUrl();
+    private static String login = ConnectionDBUtil.getLogin();
+    private static String password = ConnectionDBUtil.getPassword();
 
     @Override
     public boolean save(Status clientStatus) {

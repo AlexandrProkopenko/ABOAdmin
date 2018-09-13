@@ -7,14 +7,15 @@ import ua.spro.entity.Client;
 import ua.spro.entity.Department;
 import ua.spro.entity.History;
 import ua.spro.entity.Status;
+import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
 
 public class ClientDAOImpl implements ClientDAO {
 
-    private static String url = "jdbc:mysql://localhost:3306/abo ?serverTimezone=UTC&useSSL=false";
-    private static String login = "root";
-    private static String password = "1111";
+    private static String url = ConnectionDBUtil.getUrl();
+    private static String login = ConnectionDBUtil.getLogin();
+    private static String password = ConnectionDBUtil.getPassword();
 
     private HistoryDAOImpl historyDAO;
 
@@ -59,6 +60,14 @@ public class ClientDAOImpl implements ClientDAO {
             statement.execute();
             statement = c.prepareStatement(
                     "ALTER TABLE histories auto_increment = 1;"
+            );
+            statement.execute();
+            statement = c.prepareStatement(
+                    "DELETE  from departments"
+            );
+            statement.execute();
+            statement = c.prepareStatement(
+                    "ALTER TABLE departments auto_increment = 1;"
             );
             statement.execute();
 
@@ -222,7 +231,9 @@ public class ClientDAOImpl implements ClientDAO {
                         (resultSet.getDate(3)).toLocalDate(),
                         resultSet.getString(4),
                         resultSet.getString(5),
-                        resultSet.getString(6)
+                        resultSet.getString(6),
+                        resultSet.getInt(7),
+                        resultSet.getInt(8)
                 ));
             }
 
@@ -281,7 +292,9 @@ public class ClientDAOImpl implements ClientDAO {
                         (resultSet.getDate(3)).toLocalDate(),
                         resultSet.getString(4),
                         resultSet.getString(5),
-                        resultSet.getString(6)
+                        resultSet.getString(6),
+                        resultSet.getInt(7),
+                        resultSet.getInt(8)
                 ));
             }
 
@@ -342,7 +355,9 @@ public class ClientDAOImpl implements ClientDAO {
                         (resultSet.getDate(3)).toLocalDate(),
                         resultSet.getString(4),
                         resultSet.getString(5),
-                        resultSet.getString(6)
+                        resultSet.getString(6),
+                        resultSet.getInt(7),
+                        resultSet.getInt(8)
                 ));
             }
 

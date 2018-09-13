@@ -12,7 +12,6 @@ import ua.spro.service.impl.HistoryServiceImpl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Formatter;
 
@@ -32,31 +31,19 @@ public class ReadExcelUtil {
     }
 
     public boolean readExcel(){
-
         File excelFile = new File("Контакти АБО Дитяча телешкола.xls");
-
         try(FileInputStream fileInputStream = new FileInputStream(excelFile)){
             Workbook wb = new HSSFWorkbook(fileInputStream);
-
             for (Sheet sheet: wb  ) {
-//                System.out.println(sheet.getSheetName());
                 currentDepartmentId = wb.getSheetIndex(sheet.getSheetName())+1;
                 departmentService.save(new Department(currentDepartmentId, wb.getSheetName(currentDepartmentId-1)));
-//                System.out.println(currentDepartmentId);
                 readSheet(sheet);
-//                System.out.println();
             }
             departmentService.save(new Department("Всі"));
-
         }catch (IOException ex){
             ex.printStackTrace();
             return false;
         }
-
-
-
-
-
         return true;
     }
 
@@ -66,7 +53,6 @@ public class ReadExcelUtil {
 
     private void readSheet(Sheet sheet){
 
-
         for(int i =9; i < sheet.getLastRowNum(); i++){
             Row row = sheet.getRow(i);
             String childName = "-";
@@ -75,94 +61,81 @@ public class ReadExcelUtil {
             String phone = "-";
             String location = "-";
             StringBuilder comment = new StringBuilder();
-
             String result = null;
-
 
             if (row!=null) {
                 for (int j = 3; j < row.getLastCellNum(); j++) {
                     Cell cell = row.getCell(j);
 
                     if (cell != null) {
-//                        if (cell.getCellTypeEnum() == CellType.BLANK) break;
-//                        System.out.print(" " + j + " ");
                         switch (cell.getCellTypeEnum()){
                             case STRING:
                                 result = cell.getRichStringCellValue().toString();
                                 break;
                             case NUMERIC:
                                 if (DateUtil.isCellDateFormatted(cell)) {
-//                                    SimpleDateFormat sm = new SimpleDateFormat("yyyy-mm-dd");
-
-//                                    result = sm.format(cell.getDateCellValue());
                                     Formatter fmt = new Formatter();
                                     result = fmt.format("%tF", cell.getDateCellValue()).toString();
-//                                    LocalDate ld = LocalDate.parse( result);
-//                                    System.out.println(" parseResult: " + ld);
                                 } else {
                                     int num = (int)cell.getNumericCellValue();
                                     result = num + "";
                                 }
-
                                 break;
                             case BLANK:
                                 result = "-";
                                 break;
                                 default:
                                     System.out.println(" Непрочитана клітинка типу:  "+ cell.getCellTypeEnum());
-
-
                         }
 
-
-
-                    switch (j){
-                        case 3:
-                            childName = result;
-                            break;
-                        case 4:
-//                            System.out.println("      input parseAge " + result + "    ");
-                            ageDouble = parseAge(result);
-                            break;
-                        case 5:
-                            break;
-                        case 6:
-                            parentName = extractText(result);
-                            phone = extractPhoneNumber(result);
-                            break;
-                        case 7:
-                            comment.append(result + " ");
-                            break;
-                        case 8:
-                            comment.append(result + " ");
-                            break;
-                        case 9:
-                            comment.append(result + " ");
-                            break;
-                        case 10:
-                            comment.append(result + " ");
-                            break;
-                        case 11:
-                            comment.append(result + " ");
-                            break;
-                        case 12:
-                            location = result;
-                            break;
-                    }
-
-
-
+                        switch (j) {
+                            case 3:
+                                childName = result;
+                                break;
+                            case 4:
+                                ageDouble = parseAge(result);
+                                break;
+                            case 5:
+                                break;
+                            case 6:
+                                parentName = extractText(result);
+                                phone = extractPhoneNumber(result);
+                                break;
+                            case 7:
+                                comment.append(result + " ");
+                                break;
+                            case 8:
+                                comment.append(result + " ");
+                                break;
+                            case 9:
+                                comment.append(result + " ");
+                                break;
+                            case 10:
+                                comment.append(result + " ");
+                                break;
+                            case 11:
+                                comment.append(result + " ");
+                                break;
+                            case 12:
+                                location = result;
+                                break;
+                        }
                     }
                 }
                if (!phone.equals("-")) {
+
                    String com = comment.toString();
                    if(com.length()>255) {
                        com = com.substring(255);
                    }
-                   currentClient = new Client(childName, ageDouble+"",parentName, phone, location, currentDepartmentId, 1 );
+                    if(childName.length() > 30) childName = childName.substring(30);
+                    if(parentName.length() > 30) parentName = parentName.substring(30);
+                    if(location.length() > 30) location = location.substring(30);
 
-                currentHistory = new History(LocalDateTime.now(),com);
-                clientService.saveClientAndHistory(currentClient, currentHistory);
+                    currentClient = new Client(childName, ageDouble,parentName, phone, location, currentDepartmentId, 1 );
+
+                    currentHistory = new History(LocalDateTime.now(),com);
+                    clientService.saveClientAndHistory(currentClient, currentHistory);
 
                }
             }
@@ -210,21 +183,9 @@ public class ReadExcelUtil {
                     insert(14, " ");
         }
 
-
-//        System.out.println(builder.toString() +"    " + builder.toString().length());
         return builder.toString().substring(0, 17);
     }
 
-    private String extractDigits(String src) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < src.length(); i++) {
-            char c = src.charAt(i);
-            if (Character.isDigit(c)) {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
 
     private String extractAge(String src){
         src = src.trim();
@@ -236,7 +197,6 @@ public class ReadExcelUtil {
                 builder.append(c);
             }
         }
-//        System.out.println("      extractAge output:   " +builder.toString() + "    ");
         if (builder.toString().length() >4)
         return builder.toString().substring(0, 3);
         return builder.toString();
@@ -255,38 +215,4 @@ public class ReadExcelUtil {
     }
 
 }
-
-//                        switch (cell.getCellTypeEnum()) {
-//                            case STRING:
-//                                System.out.print(cell.getRichStringCellValue().toString());
-//                                result = cell.getRichStringCellValue().toString();
-//                                break;
-//
-//                            case NUMERIC:
-//                                if (DateUtil.isCellDateFormatted(cell)) {
-//                                    System.out.print(cell.getDateCellValue());
-//                                    result = cell.getDateCellValue().toString();
-//                                } else {
-//                                    System.out.print(cell.getNumericCellValue());
-//                                    result = cell.getNumericCellValue()+"";
-//                                }
-//                                break;
-//                            case BOOLEAN:
-//                                System.out.print(cell.getBooleanCellValue());
-//                                result = cell.getBooleanCellValue() + "";
-//                                break;
-//                            case FORMULA:
-//                                System.out.print(cell.getCellFormula());
-//                                result = cell.getCellFormula().toString();
-//                                break;
-//                            case BLANK:
-//
-//                                break;
-//
-//                            default:
-//                                System.out.print("-");
-
-//                        }
-
-
 

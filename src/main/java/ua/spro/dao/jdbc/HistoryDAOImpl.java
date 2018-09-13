@@ -6,15 +6,16 @@ import ua.spro.dao.HistoryDAO;
 import ua.spro.entity.Client;
 import ua.spro.entity.History;
 import ua.spro.service.ClientService;
+import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 
 public class HistoryDAOImpl implements HistoryDAO {
 
-    private static String url = "jdbc:mysql://localhost:3306/abo ?serverTimezone=UTC&useSSL=false";
-    private static String login = "root";
-    private static String password = "1111";
+    private static String url = ConnectionDBUtil.getUrl();
+    private static String login = ConnectionDBUtil.getLogin();
+    private static String password = ConnectionDBUtil.getPassword();
 
     @Override
     public Integer save(History history) {
