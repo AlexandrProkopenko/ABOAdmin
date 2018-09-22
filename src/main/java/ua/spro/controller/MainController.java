@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
@@ -22,12 +24,14 @@ import ua.spro.service.impl.DepartmentServiceImpl;
 import ua.spro.service.impl.HistoryServiceImpl;
 import ua.spro.service.impl.StatusServiceImpl;
 
+import ua.spro.util.ConnectionDBUtil;
 import ua.spro.util.ReadExcelUtil;
 
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Formatter;
 import java.util.List;
 
 public class MainController {
@@ -62,6 +66,9 @@ public class MainController {
     private ObservableList<Department> departmentsList;
     @FXML private ChoiceBox<Department> chbDepartments;
     @FXML private ChoiceBox<Department> chbSetDepartment;
+
+    @FXML private ImageView imViewLogo;
+    @FXML private Button btn;
 
     //сервіси звернень до бази данних
     private ClientServiceImpl clientService;
@@ -218,7 +225,23 @@ public class MainController {
     }
 
     private void historyTableSetup(){
-        clmnHistoriesDate.setCellValueFactory(new PropertyValueFactory<History, LocalDateTime>("dateTime"));
+        clmnHistoriesDate.setCellValueFactory(cellData -> cellData.getValue().dateTimeProperty());
+        clmnHistoriesDate.setCellFactory(col -> new TableCell<History, LocalDateTime>(){
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                Formatter formatter = new Formatter();
+
+                if (empty)
+                    setText(null);
+                else {
+                    formatter.format("%tF", item);
+                    setText(formatter.toString());
+                    formatter.close();
+                }
+            }
+        });
+
         clmnHistoriesComment.setCellValueFactory(new PropertyValueFactory<History, String>("comment"));
         clmnHistoriesComment.setCellFactory(TextFieldTableCell.forTableColumn());
         clmnHistoriesComment.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<History, String>>() {
@@ -243,6 +266,8 @@ public class MainController {
         chbStatuses.setItems(statusesList);
         chbSetStatus.setItems(statusesList);
         Integer statusId = statusService.getIdByClientStatus("Всі");
+        System.out.println("statusId: " + statusId);
+        if (statusId!= null)
         if (statusesList != null)
             if (statusesList.get(statusId - 1) != null) {
                 currentStatus = statusesList.get(statusId - 1);
@@ -304,6 +329,12 @@ public class MainController {
         });
     }
 
+    private void loadLogo(){
+        Image logo = new Image("/ua/spro/images/logo.jpg");
+        imViewLogo.setImage(logo);
+        imViewLogo.setVisible(true);
+    }
+
     public void initialize(){
 
         clientService = new ClientServiceImpl();
@@ -311,29 +342,25 @@ public class MainController {
         statusService = new StatusServiceImpl();
         departmentService = new DepartmentServiceImpl();
         excelUtil = new ReadExcelUtil(clientService, historyService, departmentService);
+//        btn.setVisible(false);
 
         if(clientService.testConnectionToDB()) {
             clientTableSetup();
             historyTableSetup();
             choiseboxesSetup();
+            loadLogo();
             System.out.println("setUp compleeted!");
         }
     }
 
     private void chbDepartmentsOnAction(){
         currentDepartment = chbDepartments.getValue();
-//        System.out.println("getByStatusAndDep");
-//        System.out.println(currentStatus);
-//        System.out.println(currentDepartment);
         clientsList = clientService.getClientsByStatusAndDepartment(currentStatus, currentDepartment);
         tblViewClients.setItems(clientsList);
     }
 
     private void chbStatusesOnAction(){
         currentStatus = chbStatuses.getValue();
-//        System.out.println("getByStatusAndDep");
-//        System.out.println(currentStatus);
-//        System.out.println(currentDepartment);
         clientsList = clientService.getClientsByStatusAndDepartment(currentStatus, currentDepartment);
         tblViewClients.setItems(clientsList);
     }
@@ -392,15 +419,11 @@ public class MainController {
     }
 
     public void tblViewClientsOnMouseClicked(){
-//        currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-//        System.out.println(tblViewClients.getFocusModel().getFocusedItem());
         selectedClients = tblViewClients.getSelectionModel().getSelectedItems();
         if(selectedClients!=null) {
 
             if(selectedClients.size()>1){
                 tblViewHistories.setItems(FXCollections.observableArrayList());
-
-
             }else {
                 currentClient = selectedClients.get(0);
                 if (currentClient != null) {
@@ -429,7 +452,6 @@ public class MainController {
                 }
                 chbStatusesOnAction();
             }else {
-
             }
         }
     }
@@ -464,23 +486,29 @@ public class MainController {
     public void ButtonOnAction() {
         clientService.clearTable();
         excelUtil.readExcel();
-        tblViewClients.setItems(clientsList);
+        clientTableSetup();
+        choiseboxesSetup();
+        historyTableSetup();
+
+
+//        tblViewClients.setItems(clientsList);
 //        departmentsList = departmentService.getAll();
 //        chbDepartments.setItems(departmentsList);
 //        departmentService.save(new Department("Всі"));
 
-
+//        System.out.println(ConnectionDBUtil.getCurrentIP());
+//        ConnectionDBUtil.getCurrentIp();
 //        clientService.testConnectionToDB();
     }
 
     public void tblViewHistoriesOnMouseClicked(){
-//        currentTooltip
         currentHistory = tblViewHistories.getSelectionModel().getSelectedItem();
+        if (currentHistory!=null)
         currentTooltip.setText(currentHistory.getComment());
     }
 
     public void tblViewHistoriesOnMouseEntered(){
-//         tblViewHistories.
+
     }
 
     public void tblViewHistoriesOnMouseExited(){

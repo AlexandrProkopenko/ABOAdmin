@@ -91,6 +91,7 @@ public class StatusDAOImpl implements StatusDAO {
                         resultSet.getString(2)
                 ));
             }
+            if(!list.isEmpty())
         result = list.get(0).getStatusId();
 
         } catch (SQLException e) {
