@@ -9,7 +9,7 @@ import java.util.Enumeration;
 
 public class ConnectionDBUtil {
 
-    private static String url = "jdbc:mysql://192.168.1.35:3306/abo?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
+    private static String url = "jdbc:mysql://192.168.1.34:3306/abo?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
     private static String login = "remoteUser";
     private static String password = "password";
 

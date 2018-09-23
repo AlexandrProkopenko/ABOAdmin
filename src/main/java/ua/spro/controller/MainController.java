@@ -15,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import javafx.util.StringConverter;
+import ua.spro.ABOAdminApp;
 import ua.spro.entity.Client;
 import ua.spro.entity.Department;
 import ua.spro.entity.History;
@@ -486,6 +487,8 @@ public class MainController {
     public void ButtonOnAction() {
         clientService.clearTable();
         excelUtil.readExcel();
+        currentDepartment = departmentService.getById(9);
+        currentStatus = statusService.getById(1);
         clientTableSetup();
         choiseboxesSetup();
         historyTableSetup();
@@ -517,5 +520,10 @@ public class MainController {
 
     public void tblViewClientsOnKeyTyped(){
         System.out.println(tblViewClients.getFocusModel().getFocusedItem());
+    }
+
+    public void miSettingsOnAction(){
+        System.out.println("settings");
+        ABOAdminApp.settingsStage.showAndWait();
     }
 }

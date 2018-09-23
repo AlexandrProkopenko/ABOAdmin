@@ -4,6 +4,9 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -17,7 +20,7 @@
 
 <AnchorPane prefHeight="634.0" prefWidth="1136.0" styleClass="table-view" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.MainController">
    <children>
-      <TableView fx:id="tblViewClients" editable="true" layoutX="15.0" layoutY="67.0" onKeyTyped="#tblViewClientsOnKeyTyped" onMouseClicked="#tblViewClientsOnMouseClicked" prefHeight="526.0" prefWidth="622.0">
+      <TableView fx:id="tblViewClients" editable="true" layoutX="15.0" layoutY="84.0" onKeyTyped="#tblViewClientsOnKeyTyped" onMouseClicked="#tblViewClientsOnMouseClicked" prefHeight="509.0" prefWidth="622.0">
         <columns>
           <TableColumn fx:id="clmnContactsId" prefWidth="41.0" text="№" />
           <TableColumn fx:id="clmnContactsChildName" prefWidth="115.0" text="Ім'я дитини" />
@@ -48,12 +51,12 @@
             <DatePicker fx:id="dpBirthday" prefHeight="25.0" prefWidth="132.0" GridPane.columnIndex="1" />
          </children>
       </GridPane>
-      <Label layoutX="1044.0" layoutY="25.0" text="Історія">
+      <Label layoutX="1050.0" layoutY="42.0" text="Історія">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <TableView fx:id="tblViewHistories" layoutX="650.0" layoutY="54.0" onMouseClicked="#tblViewHistoriesOnMouseClicked" onMouseEntered="#tblViewHistoriesOnMouseEntered" onMouseExited="#tblViewHistoriesOnMouseExited" prefHeight="345.0" prefWidth="467.0">
+      <TableView fx:id="tblViewHistories" layoutX="650.0" layoutY="84.0" onMouseClicked="#tblViewHistoriesOnMouseClicked" onMouseEntered="#tblViewHistoriesOnMouseEntered" onMouseExited="#tblViewHistoriesOnMouseExited" prefHeight="315.0" prefWidth="467.0">
         <columns>
           <TableColumn fx:id="clmnHistoriesDate" prefWidth="122.0" text="Дата" />
           <TableColumn fx:id="clmnHistoriesComment" prefWidth="289.0" text="Коментар" />
@@ -61,7 +64,7 @@
       </TableView>
       <TextArea fx:id="txtAreaNewComment" layoutX="651.0" layoutY="399.0" prefHeight="82.0" prefWidth="467.0" />
       <Button defaultButton="true" layoutX="1065.0" layoutY="481.0" mnemonicParsing="false" onAction="#btnAddHistoryOnAction" text="Додати" />
-      <GridPane layoutX="16.0" prefHeight="67.0" prefWidth="622.0">
+      <GridPane layoutX="16.0" layoutY="29.0" prefHeight="55.0" prefWidth="622.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="81.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="62.0" />
@@ -113,5 +116,25 @@
       </GridPane>
       <Button fx:id="btn" layoutX="650.0" layoutY="481.0" mnemonicParsing="false" onAction="#ButtonOnAction" text="Button" />
       <Button defaultButton="true" layoutX="638.0" layoutY="593.0" mnemonicParsing="false" onAction="#btnSaveContactOnAction" text="Зберегти" />
+      <MenuBar layoutY="2.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#miSettingsOnAction" text="Settings" />
+                  <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
    </children>
 </AnchorPane>
