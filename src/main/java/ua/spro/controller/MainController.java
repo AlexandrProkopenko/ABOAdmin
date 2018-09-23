@@ -501,7 +501,7 @@ public class MainController {
 
 //        System.out.println(ConnectionDBUtil.getCurrentIP());
 //        ConnectionDBUtil.getCurrentIp();
-//        clientService.testConnectionToDB();
+        clientService.testConnectionToDB();
     }
 
     public void tblViewHistoriesOnMouseClicked(){

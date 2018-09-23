@@ -13,7 +13,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.SettingsController">
    <children>
       <TreeView fx:id="treeViewMenu" layoutX="14.0" layoutY="14.0" prefHeight="573.0" prefWidth="123.0" />
@@ -49,7 +48,7 @@
                   <TextField fx:id="fldConnectionName" prefHeight="25.0" prefWidth="451.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.rowIndex="1" />
                   <TextField fx:id="fldHost" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="fldDataBase" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <TextField fx:id="fldURL" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <TextField fx:id="fldURL" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   <PasswordField fx:id="fldPassword" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <TextField fx:id="fldUser" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   <TextField fx:id="fldPort" GridPane.columnIndex="1" GridPane.rowIndex="4" />
@@ -71,6 +70,7 @@
                   </HBox>
                </children>
             </GridPane>
+            <Label fx:id="labelSaveStatus" layoutX="108.0" layoutY="338.0" text="Label" />
          </children>
       </AnchorPane>
       <GridPane layoutX="427.0" layoutY="556.0" prefHeight="35.0" prefWidth="321.0">

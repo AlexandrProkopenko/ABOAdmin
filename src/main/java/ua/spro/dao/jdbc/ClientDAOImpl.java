@@ -26,6 +26,7 @@ public class ClientDAOImpl implements ClientDAO {
 
     public boolean testConnectionToDB(){
         try (Connection c = DriverManager.getConnection(url, login, password)){
+            System.out.println(url + login + password);
             System.out.println("Connected to DB");
             return true;
         } catch (SQLException e) {
