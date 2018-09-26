@@ -5,12 +5,14 @@ import ua.spro.dao.jdbc.DepartmentDAOImpl;
 import ua.spro.entity.Department;
 import ua.spro.service.DepartmentService;
 
+import java.util.Observable;
+
 public class DepartmentServiceImpl implements DepartmentService {
 
     private DepartmentDAOImpl dao;
 
-    public DepartmentServiceImpl() {
-        dao = new DepartmentDAOImpl();
+    public DepartmentServiceImpl(Observable observable) {
+        dao = new DepartmentDAOImpl(observable);
     }
 
     @Override

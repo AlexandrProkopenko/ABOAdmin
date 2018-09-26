@@ -8,12 +8,21 @@ import ua.spro.entity.Status;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
+import java.util.Observable;
+import java.util.Observer;
 
-public class StatusDAOImpl implements StatusDAO {
+public class StatusDAOImpl implements StatusDAO, Observer {
 
-    private static String url = ConnectionDBUtil.getUrl();
-    private static String login = ConnectionDBUtil.getLogin();
-    private static String password = ConnectionDBUtil.getPassword();
+    private static String url = ConnectionDBUtil.getInstance().getUrl();
+    private static String login = ConnectionDBUtil.getInstance().getLogin();
+    private static String password = ConnectionDBUtil.getInstance().getPassword();
+
+    private Observable observable;
+
+    public StatusDAOImpl(Observable observable) {
+        this.observable = observable;
+        observable.addObserver(this);
+    }
 
     @Override
     public boolean save(Status clientStatus) {
@@ -108,4 +117,12 @@ public class StatusDAOImpl implements StatusDAO {
     }
 
 
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof ConnectionDBUtil){
+            url = ConnectionDBUtil.getInstance().getUrl();
+            login = ConnectionDBUtil.getInstance().getLogin();
+            password = ConnectionDBUtil.getInstance().getPassword();
+        }
+    }
 }

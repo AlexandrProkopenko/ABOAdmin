@@ -10,17 +10,23 @@ import ua.spro.entity.Status;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ClientDAOImpl implements ClientDAO {
+public class ClientDAOImpl implements ClientDAO, Observer {
 
-    private static String url = ConnectionDBUtil.getUrl();
-    private static String login = ConnectionDBUtil.getLogin();
-    private static String password = ConnectionDBUtil.getPassword();
+    private static String url = ConnectionDBUtil.getInstance().getUrl();
+    private static String login = ConnectionDBUtil.getInstance().getLogin();
+    private static String password = ConnectionDBUtil.getInstance().getPassword();
 
     private HistoryDAOImpl historyDAO;
+    private Observable observable;
 
-    public ClientDAOImpl(){
-        historyDAO = new HistoryDAOImpl();
+    public ClientDAOImpl(Observable observable){
+        this.observable = observable;
+        observable.addObserver(this);
+        historyDAO = new HistoryDAOImpl(ConnectionDBUtil.getInstance());
+
 
     }
 
@@ -31,7 +37,7 @@ public class ClientDAOImpl implements ClientDAO {
             return true;
         } catch (SQLException e) {
             System.out.println("Can`t connect to DB");
-            e.printStackTrace();
+//            e.printStackTrace();
             return false;
         }
     }
@@ -373,4 +379,12 @@ public class ClientDAOImpl implements ClientDAO {
         return list;
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof ConnectionDBUtil){
+             url = ConnectionDBUtil.getInstance().getUrl();
+             login = ConnectionDBUtil.getInstance().getLogin();
+             password = ConnectionDBUtil.getInstance().getPassword();
+        }
+    }
 }

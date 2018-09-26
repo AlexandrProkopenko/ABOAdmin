@@ -10,12 +10,21 @@ import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.Observable;
+import java.util.Observer;
 
-public class HistoryDAOImpl implements HistoryDAO {
+public class HistoryDAOImpl implements HistoryDAO, Observer {
 
-    private static String url = ConnectionDBUtil.getUrl();
-    private static String login = ConnectionDBUtil.getLogin();
-    private static String password = ConnectionDBUtil.getPassword();
+    private static String url = ConnectionDBUtil.getInstance().getUrl();
+    private static String login = ConnectionDBUtil.getInstance().getLogin();
+    private static String password = ConnectionDBUtil.getInstance().getPassword();
+
+    private Observable observable;
+
+    public HistoryDAOImpl(Observable observable) {
+        this.observable = observable;
+        observable.addObserver(this);
+    }
 
     @Override
     public Integer save(History history) {
@@ -189,6 +198,15 @@ public class HistoryDAOImpl implements HistoryDAO {
         }
 
         return false;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        if(o instanceof ConnectionDBUtil){
+            url = ConnectionDBUtil.getInstance().getUrl();
+            login = ConnectionDBUtil.getInstance().getLogin();
+            password = ConnectionDBUtil.getInstance().getPassword();
+        }
     }
 }
 

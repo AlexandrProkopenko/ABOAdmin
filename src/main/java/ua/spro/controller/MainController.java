@@ -90,6 +90,7 @@ public class MainController {
     private Stage mainStage;
     private ReadExcelUtil excelUtil;
 
+
     public Stage getMainStage() {
         return mainStage;
     }
@@ -338,10 +339,10 @@ public class MainController {
 
     public void initialize(){
 
-        clientService = new ClientServiceImpl();
-        historyService = new HistoryServiceImpl();
-        statusService = new StatusServiceImpl();
-        departmentService = new DepartmentServiceImpl();
+        clientService = new ClientServiceImpl(ConnectionDBUtil.getInstance());
+        historyService = new HistoryServiceImpl(ConnectionDBUtil.getInstance());
+        statusService = new StatusServiceImpl(ConnectionDBUtil.getInstance());
+        departmentService = new DepartmentServiceImpl(ConnectionDBUtil.getInstance());
         excelUtil = new ReadExcelUtil(clientService, historyService, departmentService);
 //        btn.setVisible(false);
 

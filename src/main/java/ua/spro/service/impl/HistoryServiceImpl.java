@@ -6,12 +6,14 @@ import ua.spro.entity.Client;
 import ua.spro.entity.History;
 import ua.spro.service.HistoryService;
 
+import java.util.Observable;
+
 public class HistoryServiceImpl implements HistoryService {
 
     private HistoryDAOImpl dao;
 
-    public HistoryServiceImpl() {
-        dao = new HistoryDAOImpl();
+    public HistoryServiceImpl(Observable observable) {
+        dao = new HistoryDAOImpl(observable);
     }
 
     @Override

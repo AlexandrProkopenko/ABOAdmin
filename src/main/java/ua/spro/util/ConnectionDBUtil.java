@@ -4,37 +4,53 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Observable;
 
-public class ConnectionDBUtil {
+public class ConnectionDBUtil extends Observable {
 
-    private static String url = "jdbc:mysql://192.168.1.34:3306/abo?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
-    private static String login = "remoteUser";
-    private static String password = "password";
+    private  String url = "jdbc:mysql://192.168.1.34:3306/abo?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
+    private  String login = "remoteUser";
+    private  String password = "password";
 
-    public static String getUrl() {
+    private static ConnectionDBUtil uniqueInstance = new ConnectionDBUtil();
+
+    private ConnectionDBUtil() {
+    }
+
+    public static ConnectionDBUtil getInstance(){
+        return uniqueInstance;
+    }
+
+
+    public  String getUrl() {
         return url;
     }
 
-    public static void setUrl(String url) {
-        ConnectionDBUtil.url = url;
+    public  void setUrl(String url) {
+        this.url = url;
+        setChanged();
+        notifyObservers();
     }
 
-    public static String getLogin() {
+    public String getLogin() {
         return login;
     }
 
-    public static void setLogin(String login) {
-        ConnectionDBUtil.login = login;
+    public void setLogin(String login) {
+        this.login = login;
+        setChanged();
+        notifyObservers();
     }
 
-    public static String getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public static void setPassword(String password) {
-        ConnectionDBUtil.password = password;
+    public void setPassword(String password) {
+        this.password = password;
+        setChanged();
+        notifyObservers();
     }
-
 
     public static String getCurrentIp(){
         URL whatismyip = null;

@@ -6,13 +6,15 @@ import ua.spro.dao.jdbc.StatusDAOImpl;
 import ua.spro.entity.Status;
 import ua.spro.service.StatusService;
 
+import java.util.Observable;
+
 public class StatusServiceImpl implements StatusService {
 
     private StatusDAOImpl dao;
 
 
-    public StatusServiceImpl() {
-        dao = new StatusDAOImpl();
+    public StatusServiceImpl(Observable observable) {
+        dao = new StatusDAOImpl(observable);
     }
 
     @Override

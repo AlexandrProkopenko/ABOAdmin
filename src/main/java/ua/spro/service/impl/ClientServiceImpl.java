@@ -8,12 +8,14 @@ import ua.spro.entity.History;
 import ua.spro.entity.Status;
 import ua.spro.service.ClientService;
 
+import java.util.Observable;
+
 public class ClientServiceImpl implements ClientService {
 
     private ClientDAOImpl dao;
 
-    public ClientServiceImpl() {
-        dao = new ClientDAOImpl();
+    public ClientServiceImpl(Observable observable) {
+        dao = new ClientDAOImpl(observable);
     }
 
     public boolean testConnectionToDB(){
