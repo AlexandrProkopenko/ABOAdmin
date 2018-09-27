@@ -23,12 +23,14 @@
       <TableView fx:id="tblViewClients" editable="true" layoutX="15.0" layoutY="84.0" onKeyTyped="#tblViewClientsOnKeyTyped" onMouseClicked="#tblViewClientsOnMouseClicked" prefHeight="509.0" prefWidth="622.0">
         <columns>
           <TableColumn fx:id="clmnContactsId" prefWidth="41.0" text="№" />
-          <TableColumn fx:id="clmnContactsChildName" prefWidth="115.0" text="Ім'я дитини" />
-            <TableColumn fx:id="clmnContactsAge" prefWidth="39.0" text="Вік" />
-            <TableColumn fx:id="clmnContactsBirthday" prefWidth="106.0" text="Дата народження" />
-            <TableColumn fx:id="clmnContactsParentName" prefWidth="104.0" text="ФІО батьків" />
-            <TableColumn fx:id="clmnContactsPhone" prefWidth="105.0" text="Номер телефону" />
-            <TableColumn fx:id="clmnContactsLocation" prefWidth="104.0" text="Район" />
+          <TableColumn fx:id="clmnContactsChildName" prefWidth="81.0" text="Ім'я дитини" />
+            <TableColumn fx:id="clmnContactsAge" prefWidth="50.0" text="Вік" />
+            <TableColumn fx:id="clmnContactsBirthday" prefWidth="92.0" text="Дата народження" />
+            <TableColumn fx:id="clmnContactsParentName" prefWidth="141.0" text="ФІО батьків" />
+            <TableColumn fx:id="clmnContactsPhone" prefWidth="107.0" text="Номер телефону" />
+            <TableColumn fx:id="clmnContactsLocation" prefWidth="109.0" text="Район" />
+            <TableColumn fx:id="clmnContactsDepartment" minWidth="0.0" prefWidth="0.0" text="Філія" visible="false" />
+            <TableColumn fx:id="clmnContactsStatus" prefWidth="21.0" text="Статус" />
         </columns>
       </TableView>
       <GridPane layoutX="15.0" layoutY="594.0" prefHeight="55.0" prefWidth="622.0">
@@ -121,7 +123,8 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#miSettingsOnAction" text="Settings" />
-                  <MenuItem mnemonicParsing="false" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#miImportExcelOnAction" text="Import excel" />
+                  <MenuItem mnemonicParsing="false" onAction="#miCloseOnAction" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">

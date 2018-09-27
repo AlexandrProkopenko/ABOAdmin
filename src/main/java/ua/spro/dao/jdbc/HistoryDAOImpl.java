@@ -19,11 +19,10 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
     private static String login = ConnectionDBUtil.getInstance().getLogin();
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
-    private Observable observable;
 
-    public HistoryDAOImpl(Observable observable) {
-        this.observable = observable;
-        observable.addObserver(this);
+    public HistoryDAOImpl() {
+
+        ConnectionDBUtil.getInstance().addObserver(this);
     }
 
     @Override

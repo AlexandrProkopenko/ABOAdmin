@@ -11,8 +11,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     private DepartmentDAOImpl dao;
 
-    public DepartmentServiceImpl(Observable observable) {
-        dao = new DepartmentDAOImpl(observable);
+    public DepartmentServiceImpl() {
+        dao = new DepartmentDAOImpl();
     }
 
     @Override

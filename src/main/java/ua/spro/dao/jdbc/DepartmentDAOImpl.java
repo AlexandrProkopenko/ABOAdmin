@@ -16,11 +16,10 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
     private static String login = ConnectionDBUtil.getInstance().getLogin();
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
-    private Observable observable;
 
-    public DepartmentDAOImpl(Observable observable) {
-        this.observable = observable;
-        observable.addObserver(this);
+    public DepartmentDAOImpl() {
+
+        ConnectionDBUtil.getInstance().addObserver(this);
     }
 
     @Override
@@ -85,11 +84,6 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        System.out.println("inDao department");
-//        for(Department n: list){
-//            System.out.println(n);
-//            System.out.println("ddd");
-//        }
         return list;
     }
 

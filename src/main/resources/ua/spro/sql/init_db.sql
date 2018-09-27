@@ -57,10 +57,11 @@ create table clients_history
 );
 
 insert into statuses values(null, 'Новий');
-insert into statuses values(null, 'Запрошені на МК');
+insert into statuses values(null, 'Цікавляться');
+insert into statuses values(null, 'Будуть на МК');
 insert into statuses values(null, 'Були на МК');
-insert into statuses values(null, 'Внесли гроші');
 insert into statuses values(null, 'Навчаються');
 insert into statuses values(null, 'Старички');
+insert into statuses values(null, 'Ходили раніше');
 insert into statuses values(null, 'Відмовились');
 insert into statuses values(null, 'Всі');

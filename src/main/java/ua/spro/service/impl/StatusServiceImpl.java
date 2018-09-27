@@ -13,8 +13,8 @@ public class StatusServiceImpl implements StatusService {
     private StatusDAOImpl dao;
 
 
-    public StatusServiceImpl(Observable observable) {
-        dao = new StatusDAOImpl(observable);
+    public StatusServiceImpl() {
+        dao = new StatusDAOImpl();
     }
 
     @Override

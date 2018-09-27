@@ -14,8 +14,8 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientDAOImpl dao;
 
-    public ClientServiceImpl(Observable observable) {
-        dao = new ClientDAOImpl(observable);
+    public ClientServiceImpl() {
+        dao = new ClientDAOImpl();
     }
 
     public boolean testConnectionToDB(){

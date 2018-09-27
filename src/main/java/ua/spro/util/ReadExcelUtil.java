@@ -1,13 +1,17 @@
 package ua.spro.util;
 
+import javafx.collections.ObservableList;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.spro.entity.Client;
 import ua.spro.entity.Department;
 import ua.spro.entity.History;
+import ua.spro.entity.Status;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.service.impl.DepartmentServiceImpl;
 import ua.spro.service.impl.HistoryServiceImpl;
+import ua.spro.service.impl.StatusServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,20 +24,26 @@ public class ReadExcelUtil {
     private ClientServiceImpl clientService;
     private HistoryServiceImpl historyService;
     private DepartmentServiceImpl departmentService;
+    private StatusServiceImpl statusService;
     private Client currentClient;
     private History currentHistory;
     private int currentDepartmentId;
+    private Status currentStatus;
+    private ObservableList<Status> statusList;
 
     public ReadExcelUtil(ClientServiceImpl clientService, HistoryServiceImpl historyService, DepartmentServiceImpl departmentService) {
         this.clientService = clientService;
         this.historyService = historyService;
         this.departmentService = departmentService;
+        statusService = new StatusServiceImpl();
+        currentStatus = new Status("");
     }
 
-    public boolean readExcel(){
-        File excelFile = new File("Контакти АБО Дитяча телешкола.xls");
+    public boolean readExcel(File excelFile){
+//        File excelFile = new File("Контакти АБО Дитяча телешкола.xls");
+        statusList = statusService.getAll();
         try(FileInputStream fileInputStream = new FileInputStream(excelFile)){
-            Workbook wb = new HSSFWorkbook(fileInputStream);
+            Workbook wb = new XSSFWorkbook(fileInputStream);
             for (Sheet sheet: wb  ) {
                 currentDepartmentId = wb.getSheetIndex(sheet.getSheetName())+1;
                 departmentService.save(new Department(currentDepartmentId, wb.getSheetName(currentDepartmentId-1)));
@@ -102,7 +112,15 @@ public class ReadExcelUtil {
                                 phone = extractPhoneNumber(result);
                                 break;
                             case 7:
-                                comment.append(result + " ");
+                                System.out.println("Зчитано строку   result (status)" + result );
+                                currentStatus.setClientStatus(result);
+                                if(statusList.contains(currentStatus)){
+                                    currentStatus.setStatusId(statusList.indexOf(currentStatus)+1);
+                                }
+                                if (currentStatus.getStatusId() == null){
+                                    currentStatus.setStatusId(1);
+                                }
+                                System.out.println("Присвоєно statusId: " + currentStatus.getStatusId());
                                 break;
                             case 8:
                                 comment.append(result + " ");
@@ -125,15 +143,15 @@ public class ReadExcelUtil {
                if (!phone.equals("-")) {
 
                    String com = comment.toString();
-                   if(com.length()>255) {
-                       com = com.substring(255);
+                   if(com.length()>=255) {
+                       com = com.substring(0, 254);
                    }
-                    if(childName.length() > 30) childName = childName.substring(30);
-                    if(parentName.length() > 30) parentName = parentName.substring(30);
-                    if(location.length() > 30) location = location.substring(30);
+                    if(childName.length() >= 30) childName = childName.substring(0, 29);
+                    if(parentName.length() >= 30) parentName = parentName.substring(0, 29);
+                    if(location.length() >= 30) location = location.substring(0, 29);
 
-                    currentClient = new Client(childName, ageDouble,parentName, phone, location, currentDepartmentId, 1 );
-
+                    currentClient = new Client(childName, ageDouble,parentName, phone, location, currentDepartmentId, currentStatus.getStatusId() );
+                    currentStatus.setStatusId(null);
                     currentHistory = new History(LocalDateTime.now(),com);
                     clientService.saveClientAndHistory(currentClient, currentHistory);
 
@@ -187,18 +205,19 @@ public class ReadExcelUtil {
     }
 
 
-    private String extractAge(String src){
+    public String extractAge(String src){
         src = src.trim();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < src.length(); i++) {
            char c = src.charAt(i);
-            if (Character.isDigit(c) || c == ',') {
+            if (Character.isDigit(c) || c == ',' || c  == '.') {
                 if (c == ',') c = '.';
                 builder.append(c);
             }
         }
         if (builder.toString().length() >4)
         return builder.toString().substring(0, 3);
+
         return builder.toString();
     }
 

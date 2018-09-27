@@ -1,8 +1,13 @@
 package ua.spro.controller;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -12,14 +17,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import ua.spro.ABOAdminApp;
 import ua.spro.entity.Client;
 import ua.spro.entity.Department;
 import ua.spro.entity.History;
 import ua.spro.entity.Status;
+import ua.spro.service.ClientService;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.service.impl.DepartmentServiceImpl;
 import ua.spro.service.impl.HistoryServiceImpl;
@@ -29,9 +37,10 @@ import ua.spro.util.ConnectionDBUtil;
 import ua.spro.util.ReadExcelUtil;
 
 
-
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 
@@ -54,6 +63,9 @@ public class MainController {
     @FXML private TableColumn<Client, String> clmnContactsParentName;
     @FXML private TableColumn<Client, String> clmnContactsPhone;
     @FXML private TableColumn<Client, String> clmnContactsLocation;
+    @FXML private TableColumn<Client, Integer> clmnContactsDepartment;
+    @FXML private TableColumn<Client, Integer> clmnContactsStatus;
+
     //таблиця історії коментарів і її колонки
     private ObservableList<History> historiesList;
     @FXML private TableView<History> tblViewHistories;
@@ -91,6 +103,8 @@ public class MainController {
     private ReadExcelUtil excelUtil;
 
 
+
+
     public Stage getMainStage() {
         return mainStage;
     }
@@ -105,8 +119,13 @@ public class MainController {
         }
     }
 
-    private void clientTableSetup(){
+    private void fillClientData(){
         clientsList = clientService.getAll();
+        tblViewClients.setItems(clientsList);
+    }
+
+    private void clientTableSetup(){
+
         //звязування колонок таблиці з класами
         clmnContactsId.setCellValueFactory(new PropertyValueFactory<Client, Void>("№"));
         clmnContactsId.setCellFactory(col -> new TableCell<Client, Void>() {
@@ -119,9 +138,36 @@ public class MainController {
                     setText(Integer.toString(index+1));
                 }
             }
+
+
         });
+
+
+
         clmnContactsChildName.setCellValueFactory(new PropertyValueFactory<Client, String>("childName"));
-        clmnContactsChildName.setCellFactory(TextFieldTableCell.forTableColumn());
+        clmnContactsChildName.setCellFactory(column -> {
+            return new TableCell<Client, String>(){
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? "" : getItem().toString());
+                    setGraphic(null);
+
+                    TableRow<Client> currentRow = getTableRow();
+//                    currentRow.getTableView().get
+//                    if (!isEmpty()) {
+//
+//                        if(item.equals("Маша"))
+//                            currentRow.setStyle("-fx-background-color:lightcoral");
+//                        else
+//                            currentRow.setStyle("-fx-background-color:lightgreen");
+//                    }
+                }
+            };
+        });
+
+
+
         clmnContactsChildName.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, String> event) {
@@ -218,12 +264,69 @@ public class MainController {
                 clientService.update(currentClient);
             }
         });
+        clmnContactsStatus.setCellValueFactory(new PropertyValueFactory<Client, Integer>("departmentId"));
+        clmnContactsStatus.setCellFactory(column -> {
+                    return new TableCell<Client, Integer>() {
+                        @Override
+                        protected void updateItem(Integer item, boolean empty) {
+                            super.updateItem(item, empty);
+                            setText(empty ? "" : getItem().toString());
+                            setGraphic(null);
 
-        tblViewClients.setItems(clientsList);
+                            TableRow<Client> currentRow = getTableRow();
+//                            System.out.println(item);
+                            if (!isEmpty()) {
+
+                                switch (item) {
+                                    case 1:
+                                        currentRow.setStyle("-fx-background-color:#f5f5dc");
+                                        break;
+                                    case 2:
+                                        currentRow.setStyle("-fx-background-color:#ebf4be");
+                                        break;
+                                    case 3:
+                                        currentRow.setStyle("-fx-background-color:#f5deb3");
+                                        break;
+                                    case 4:
+                                        currentRow.setStyle("-fx-background-color:#ffcc6e");
+                                        break;
+                                    case 5:
+                                        currentRow.setStyle("-fx-background-color:darkseagreen");
+                                        break;
+                                    case 6:
+                                        currentRow.setStyle("-fx-background-color:#77a98e");
+                                        break;
+                                    case 7:
+                                        currentRow.setStyle("-fx-background-color:rgba(207,137,106,0.82)");
+                                        break;
+                                    case 8:
+                                        currentRow.setStyle("-fx-background-color:#ff9d7e");
+                                        break;
+                                    case 9:
+                                        currentRow.setStyle("-fx-background-color:#fffaf5");
+                                        break;
+                                }
+                            }
+                        }
+                    };
+
+                });
+
+
+        clmnContactsDepartment.setCellValueFactory(new PropertyValueFactory<Client, Integer>("statusId"));
+
+
+
+
+
+
+
+
+
+        fillClientData();
         tblViewClients.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         selectedClients = FXCollections.observableArrayList();
         tblViewClients.setEditable(true);
-
     }
 
     private void historyTableSetup(){
@@ -262,20 +365,41 @@ public class MainController {
 
     }
 
-    private void choiseboxesSetup(){
-
+    private void fillChoiseBoxes(){
         statusesList = statusService.getAll();
         chbStatuses.setItems(statusesList);
         chbSetStatus.setItems(statusesList);
+        showList(statusesList);
         Integer statusId = statusService.getIdByClientStatus("Всі");
-        System.out.println("statusId: " + statusId);
+        System.err.println("statusId: " + statusId);
         if (statusId!= null)
-        if (statusesList != null)
-            if (statusesList.get(statusId - 1) != null) {
-                currentStatus = statusesList.get(statusId - 1);
-                chbStatuses.setValue(currentStatus);
+            if (statusesList != null)
+                if (statusesList.get(statusId - 1) != null) {
+                    currentStatus = statusesList.get(statusId - 1);
+                    chbStatuses.setValue(currentStatus);
+                    System.err.println(currentStatus);
 
-            }
+                }
+
+        departmentsList = departmentService.getAll();
+        showList(departmentsList);
+        chbDepartments.setItems(departmentsList);
+        chbSetDepartment.setItems(departmentsList);
+
+        Integer departmentId = departmentService.getIdByClientDepartment("Всі");
+        System.err.println("departmentId: " + departmentId);
+            if (departmentId != null)
+                if (departmentsList.get(departmentId - 1) != null) {
+                    currentDepartment = departmentsList.get(departmentId - 1);
+                    chbDepartments.setValue(currentDepartment);
+                    System.err.println(currentDepartment);
+                }
+        System.err.println("Current status " + currentStatus + "     current department " + currentDepartment);
+    }
+
+    private void choiseboxesSetup(){
+        fillChoiseBoxes();
+
         //дії чойз боксів при виборі елемента
         chbStatuses.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -291,17 +415,7 @@ public class MainController {
             }
         });
 
-        departmentsList = departmentService.getAll();
-        chbDepartments.setItems(departmentsList);
-        chbSetDepartment.setItems(departmentsList);
-        if (!departmentsList.isEmpty()) {
-            Integer departmentId = departmentService.getIdByClientDepartment("Всі");
-            if (departmentId != null)
-                if (departmentsList.get(departmentId - 1) != null) {
-                    currentDepartment = departmentsList.get(departmentId - 1);
-                    chbDepartments.setValue(currentDepartment);
-                }
-        }
+
         chbDepartments.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -313,6 +427,16 @@ public class MainController {
             @Override
             public void handle(ActionEvent event) {
                 newDepartment = chbSetDepartment.getValue();
+            }
+        });
+
+        System.out.println(chbStatuses.getStylesheets());
+
+        chbStatuses.setOnShowing(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+
+                System.out.println( chbStatuses.getContextMenu().getStyleClass() );
             }
         });
 
@@ -329,6 +453,8 @@ public class MainController {
                 }
             }
         });
+
+
     }
 
     private void loadLogo(){
@@ -339,10 +465,10 @@ public class MainController {
 
     public void initialize(){
 
-        clientService = new ClientServiceImpl(ConnectionDBUtil.getInstance());
-        historyService = new HistoryServiceImpl(ConnectionDBUtil.getInstance());
-        statusService = new StatusServiceImpl(ConnectionDBUtil.getInstance());
-        departmentService = new DepartmentServiceImpl(ConnectionDBUtil.getInstance());
+        clientService = new ClientServiceImpl();
+        historyService = new HistoryServiceImpl();
+        statusService = new StatusServiceImpl();
+        departmentService = new DepartmentServiceImpl();
         excelUtil = new ReadExcelUtil(clientService, historyService, departmentService);
 //        btn.setVisible(false);
 
@@ -353,6 +479,9 @@ public class MainController {
             loadLogo();
             System.out.println("setUp compleeted!");
         }
+
+
+
     }
 
     private void chbDepartmentsOnAction(){
@@ -486,13 +615,27 @@ public class MainController {
     }
 
     public void ButtonOnAction() {
-        clientService.clearTable();
-        excelUtil.readExcel();
-        currentDepartment = departmentService.getById(9);
-        currentStatus = statusService.getById(1);
-        clientTableSetup();
-        choiseboxesSetup();
-        historyTableSetup();
+
+        System.out.println( chbStatuses.getStylesheets() );
+        chbStatuses.onShowingProperty().addListener(new ChangeListener<EventHandler<Event>>() {
+            @Override
+            public void changed(ObservableValue<? extends EventHandler<Event>> observable, EventHandler<Event> oldValue, EventHandler<Event> newValue) {
+
+            }
+        });
+
+//        clientService.clearTable();
+//        excelUtil.readExcel();
+//        currentDepartment = departmentService.getById(9);
+//        currentStatus = statusService.getById(1);
+//        clientTableSetup();
+//        choiseboxesSetup();
+//        historyTableSetup();
+
+//
+//        System.out.println( excelUtil.extractAge("8,5") );
+//        System.out.println( excelUtil.extractAge("8.5") );
+//        System.out.println( excelUtil.extractAge("8") );
 
 
 //        tblViewClients.setItems(clientsList);
@@ -502,7 +645,7 @@ public class MainController {
 
 //        System.out.println(ConnectionDBUtil.getCurrentIP());
 //        ConnectionDBUtil.getCurrentIp();
-        clientService.testConnectionToDB();
+//        clientService.testConnectionToDB();
     }
 
     public void tblViewHistoriesOnMouseClicked(){
@@ -526,5 +669,38 @@ public class MainController {
     public void miSettingsOnAction(){
         System.out.println("settings");
         ABOAdminApp.settingsStage.showAndWait();
+    }
+
+    public void miImportExcelOnAction(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Імпорт з excel файлу");
+        alert.initOwner(mainStage);
+        alert.setHeaderText("Ця процедура видалить всі існуючі дані і заповнить базу даних новими!");
+        alert.showAndWait();
+        if(alert.getResult() == ButtonType.OK){
+            importFromExcel();
+        }else {
+
+        }
+    }
+
+    private void importFromExcel(){
+        File file = new File("Контакти АБО Дитяча телешкола.xlsx");
+        if (!file.exists()){
+            FileChooser chooser = new FileChooser();
+            file = chooser.showOpenDialog(mainStage);
+        }
+        clientService.clearTable();
+        excelUtil.readExcel(file);
+        currentDepartment = departmentService.getById(9);
+        currentStatus = statusService.getById(1);
+        fillClientData();
+        fillChoiseBoxes();
+
+    }
+
+    public void miCloseOnAction(){
+
+        mainStage.close();
     }
 }

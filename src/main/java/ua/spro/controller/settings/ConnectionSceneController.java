@@ -28,43 +28,19 @@ public class ConnectionSceneController {
     private ObservableList<DBConnection> connections;
     private DBConnection currentConnection;
     private DBConnection newConnection;
-    private static final String fileName = "connections.ser";
-    private static final String filePath = "sys/";
+
     private static final String urlBegin = "jdbc:mysql://";
     private static final String urlEnd = "?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false";
-    private File file;
+
     private String host = "";
     private String dataBase = "";
     private String port = "";
     private String url;
     private ClientServiceImpl clientService;
 
-    private ObservableList<DBConnection> loadSavedConnectionsList(){
-        ObservableList<DBConnection> list = FXCollections.observableArrayList();
-        try{
-            FileInputStream fis = new FileInputStream(file);
-//            System.err.println("fis " + fis.available());
-            if(fis.available() == 0) return list;
-            ObjectInputStream ois = new ObjectInputStream(fis);
-//            System.err.println("ois");
-            boolean check=true;
-            while (check) {
-                try {
-                    Object object = ois.readObject();
-                    list.add((DBConnection) object);
-                }catch(EOFException ex){
-                    check = false;
-                }
-            }
-        }
 
-        catch (IOException e){
-            System.err.println("IO exception");
-            e.printStackTrace();
-        }catch (ClassNotFoundException e){
-            e.printStackTrace();
-        }
-        return list;
+    public ConnectionSceneController() {
+        System.out.println("connection scene controller constructor");
     }
 
     private void chbConnectionsOnAction(){
@@ -83,48 +59,12 @@ public class ConnectionSceneController {
         }
     }
 
-    private boolean saveConnectionsToFile(ObservableList<DBConnection> list){
-        if (!file.exists()){
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            for(DBConnection connection: list) {
-                oos.writeObject(connection);
-            }
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-            return false;
-        }catch (IOException ex){
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
 
-    private void fileSetup(){
-        file = new File(filePath);
-        if(!file.exists()){
-            file.mkdir();
-        }
-        file = new File(filePath, fileName);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        }catch (IOException e){
-            e.printStackTrace();
 
-        }
-    }
+
 
     private void choiseBoxSetup(){
-        connections = loadSavedConnectionsList();
+        connections = ConnectionDBUtil.loadSavedConnectionsList();
         if(connections!=null) {
             chbConnections.setItems(connections);
             if(!connections.isEmpty()) {
@@ -173,10 +113,10 @@ public class ConnectionSceneController {
 
     public void initialize(){
         hideLabels();
-        fileSetup();
         choiseBoxSetup();
         textFieldsSetup();
-        clientService = new ClientServiceImpl(ConnectionDBUtil.getInstance());
+        clientService = new ClientServiceImpl();
+        System.out.println("initialize connection properties");
 
     }
 
@@ -186,7 +126,7 @@ public class ConnectionSceneController {
         if (currentConnection != null){
             connections.remove(currentConnection);
         }
-        if( saveConnectionsToFile(connections) ){
+        if(ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection) ){
             labelSaveStatus.setStyle("-fx-text-fill: green");
             labelSaveStatus.setText("Видалено");
         }else {
@@ -219,7 +159,7 @@ public class ConnectionSceneController {
         if(!connections.contains(newConnection)) {
             connections.add(newConnection);
             labelSaveStatus.setVisible(true);
-            if (saveConnectionsToFile(connections)) {
+            if (ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection)) {
                 System.out.println("save connection");
                 labelSaveStatus.setVisible(true);
                 labelSaveStatus.setStyle("-fx-text-fill: green");
@@ -254,6 +194,13 @@ public class ConnectionSceneController {
             labelConnectionStatus.setStyle("-fx-text-fill: red");
             labelConnectionStatus.setText("Не вдалося під'єднатися до сервера");
         }
+    }
+
+    public void apply(){
+
+            ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
+
+
     }
 
 }

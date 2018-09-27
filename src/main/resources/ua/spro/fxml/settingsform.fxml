@@ -24,7 +24,7 @@
          <children>
             <Button mnemonicParsing="false" onAction="#btnOkOnAction" prefWidth="90.0" text="Ок" />
             <Button mnemonicParsing="false" onAction="#btnCancelOnAction" prefWidth="90.0" text="Відміна" GridPane.columnIndex="1" />
-            <Button mnemonicParsing="false" onAction="#btnApplyOnAction" prefHeight="25.0" prefWidth="90.0" text="Застосувати" GridPane.columnIndex="2" />
+            <Button fx:id="btnApply" mnemonicParsing="false" onAction="#btnApplyOnAction" prefHeight="25.0" prefWidth="90.0" text="Застосувати" GridPane.columnIndex="2" />
          </children>
       </GridPane>
       <SubScene fx:id="subScene" height="540.0" layoutX="144.0" layoutY="14.0" width="650.0">

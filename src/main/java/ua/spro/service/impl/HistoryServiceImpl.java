@@ -12,8 +12,8 @@ public class HistoryServiceImpl implements HistoryService {
 
     private HistoryDAOImpl dao;
 
-    public HistoryServiceImpl(Observable observable) {
-        dao = new HistoryDAOImpl(observable);
+    public HistoryServiceImpl() {
+        dao = new HistoryDAOImpl();
     }
 
     @Override

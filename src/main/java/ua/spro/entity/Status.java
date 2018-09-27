@@ -34,4 +34,18 @@ public class Status {
     public String toString() {
         return  clientStatus;
     }
+
+    @Override
+    public int hashCode() {
+        return clientStatus.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Status status = (Status)obj;
+                if (status != null)
+        return this.getClientStatus().equalsIgnoreCase(status.getClientStatus());
+
+        return super.equals(obj);
+    }
 }

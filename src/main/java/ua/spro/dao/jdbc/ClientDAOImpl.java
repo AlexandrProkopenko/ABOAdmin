@@ -20,12 +20,12 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
     private HistoryDAOImpl historyDAO;
-    private Observable observable;
 
-    public ClientDAOImpl(Observable observable){
-        this.observable = observable;
-        observable.addObserver(this);
-        historyDAO = new HistoryDAOImpl(ConnectionDBUtil.getInstance());
+
+    public ClientDAOImpl(){
+
+        ConnectionDBUtil.getInstance().addObserver(this);
+        historyDAO = new HistoryDAOImpl();
 
 
     }
@@ -338,14 +338,21 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     }
 
     public ObservableList<Client> getClientsByStatusAndDepartment(Status status, Department department){
+        System.err.println("Client DAO. Status: " + status + "    department " + department);
+        ObservableList<Client> list = FXCollections.observableArrayList();
+        if(department == null || status == null)
+            return list;
+
+
         if(department.getClientDepartment().equals("Всі")){
             return getClientsByStatus(status);
         }
+
         if(status.getClientStatus().equals("Всі")){
             return getClientsByDepartment(department);
         }
 
-        ObservableList<Client> list = FXCollections.observableArrayList();
+//        ObservableList<Client> list = FXCollections.observableArrayList();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * FROM abo.clients WHERE department_id = ? AND status_id = ? "

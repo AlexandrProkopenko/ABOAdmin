@@ -17,11 +17,9 @@ public class StatusDAOImpl implements StatusDAO, Observer {
     private static String login = ConnectionDBUtil.getInstance().getLogin();
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
-    private Observable observable;
+    public StatusDAOImpl() {
 
-    public StatusDAOImpl(Observable observable) {
-        this.observable = observable;
-        observable.addObserver(this);
+        ConnectionDBUtil.getInstance().addObserver(this);
     }
 
     @Override

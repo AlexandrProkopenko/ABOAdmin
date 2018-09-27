@@ -1,9 +1,13 @@
 package ua.spro;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -35,6 +39,10 @@ public class ABOAdminApp extends Application {
         mainController = mainLoader.getController();
         mainController.setMainStage(mainStage);
 
+
+
+
+
         Image ico = new Image("ua/spro/images/logo.jpg");
         mainStage.getIcons().add(ico);
 
@@ -55,5 +63,10 @@ public class ABOAdminApp extends Application {
         settingsStage.getIcons().add(ico);
 //        mainStage.getScene().getStylesheets().add("ua/spro/css/caspian.css");
         mainStage.show();
+
+
+        settingsStage.setOnCloseRequest(event -> {
+//            mainController.
+        });
     }
 }
