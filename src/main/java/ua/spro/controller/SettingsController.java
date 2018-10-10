@@ -31,6 +31,14 @@ public class SettingsController {
     private TreeItem<String> selectedItem;
 
 
+    public Button getBtnApply() {
+        return btnApply;
+    }
+
+    public void setBtnApply(Button btnApply) {
+        this.btnApply = btnApply;
+    }
+
     private void treeViewSetup(){
         connectionMenuItem = new TreeItem<>();
         rootMenuItem = new TreeItem<>();
@@ -66,7 +74,7 @@ public class SettingsController {
             connectionLoader.setLocation(getClass().getResource(connectionFXMLPath));
             connectionRoot = connectionLoader.load();
             connectionSceneController = connectionLoader.getController();
-            System.out.println(connectionSceneController);
+            connectionSceneController.setSettingsController(this);
 
 
             fooRoot = FXMLLoader.load(getClass().getResource(fooFXMLPath));
@@ -96,11 +104,23 @@ public class SettingsController {
                 break;
         }
 
-
+        btnApply.setDisable(true);
     }
 
     @FXML
     void btnCancelOnAction(ActionEvent event) {
+        switch (selectedItem .getValue()){
+            case "З'єднання":
+                connectionSceneController.cancel();
+                btnApply.setDisable(true);
+                break;
+            case "foo":
+
+                break;
+            default:
+                break;
+        }
+
         ABOAdminApp.settingsStage.close();
     }
 
@@ -109,5 +129,6 @@ public class SettingsController {
         btnApplyOnAction();
         ABOAdminApp.settingsStage.close();
     }
+
 
 }

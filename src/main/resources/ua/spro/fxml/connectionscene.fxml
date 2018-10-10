@@ -14,7 +14,7 @@
 
 <AnchorPane prefHeight="525.0" prefWidth="663.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.settings.ConnectionSceneController">
    <children>
-      <GridPane layoutX="14.0" layoutY="14.0" prefHeight="324.0" prefWidth="645.0">
+      <GridPane layoutX="14.0" layoutY="14.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="324.0" prefWidth="645.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="317.0" minWidth="10.0" prefWidth="94.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="551.0" minWidth="10.0" prefWidth="551.0" />

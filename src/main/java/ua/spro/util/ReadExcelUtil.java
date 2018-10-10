@@ -1,7 +1,6 @@
 package ua.spro.util;
 
 import javafx.collections.ObservableList;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.spro.entity.Client;
@@ -200,8 +199,9 @@ public class ReadExcelUtil {
                     insert(11, " ").
                     insert(14, " ");
         }
-
+        if(builder.toString().length()>=17)
         return builder.toString().substring(0, 17);
+        return "";
     }
 
 

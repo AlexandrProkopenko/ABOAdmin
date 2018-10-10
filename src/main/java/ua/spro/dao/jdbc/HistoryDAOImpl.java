@@ -105,11 +105,9 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("inDao");
-        for(History n: list){
-            System.out.println(n);
-            System.out.println("ddd");
-        }
+//        for(History n: list){
+//            System.out.println(n);
+//        }
         return list;
     }
 
@@ -143,10 +141,8 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("inDao");
         for(History n: list){
             System.out.println(n);
-            System.out.println("ddd");
         }
         return list;
     }

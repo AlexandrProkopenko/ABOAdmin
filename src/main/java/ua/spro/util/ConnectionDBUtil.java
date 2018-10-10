@@ -25,14 +25,12 @@ public class ConnectionDBUtil extends Observable {
     private static ConnectionDBUtil uniqueInstance = new ConnectionDBUtil();
 
     private ConnectionDBUtil() {
-        System.out.println("connection db util constructor");
         fileSetup();
         connection = loadSavedConnectionsList().get(0);
         if(connection != null){
             url = connection.getFullURL();
             login = connection.getUser();
             password = connection.getPassword();
-            System.out.println(connection.getName());
         }
     }
 

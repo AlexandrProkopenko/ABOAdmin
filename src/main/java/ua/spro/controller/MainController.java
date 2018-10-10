@@ -1,5 +1,7 @@
 package ua.spro.controller;
 
+import com.sun.javafx.css.Style;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,7 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -17,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -63,6 +68,7 @@ public class MainController {
     @FXML private TableColumn<Client, String> clmnContactsParentName;
     @FXML private TableColumn<Client, String> clmnContactsPhone;
     @FXML private TableColumn<Client, String> clmnContactsLocation;
+//    @FXML private TableColumn<Client, Integer> clmnContactsDepartment;
     @FXML private TableColumn<Client, Integer> clmnContactsDepartment;
     @FXML private TableColumn<Client, Integer> clmnContactsStatus;
 
@@ -179,6 +185,8 @@ public class MainController {
                 clientService.update(currentClient);
             }
         });
+        clmnContactsChildName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
+
         clmnContactsAge.setCellValueFactory(new PropertyValueFactory<Client, Double>("age"));
         clmnContactsAge.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Double>() {
             @Override
@@ -199,6 +207,7 @@ public class MainController {
                 currentClient.setAge(newValue);
                 System.out.println(currentClient);
                 clientService.update(currentClient);
+                tblViewClients.refresh();
             }
         });
         clmnContactsBirthday.setCellValueFactory(new PropertyValueFactory<Client, LocalDate>("birthday"));
@@ -224,7 +233,7 @@ public class MainController {
                 currentClient.setBirthday(newValue);
                 System.out.println(currentClient);
                 clientService.update(currentClient);
-
+                tblViewClients.refresh();
 
             }
         });
@@ -240,6 +249,8 @@ public class MainController {
                 clientService.update(currentClient);
             }
         });
+        clmnContactsParentName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
+
         clmnContactsPhone.setCellValueFactory(new PropertyValueFactory<Client, String>("phone"));
         clmnContactsPhone.setCellFactory(TextFieldTableCell.forTableColumn());
         clmnContactsPhone.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
@@ -270,43 +281,52 @@ public class MainController {
                         @Override
                         protected void updateItem(Integer item, boolean empty) {
                             super.updateItem(item, empty);
-                            setText(empty ? "" : getItem().toString());
+                            setText(empty ? "" : statusesList.get(item-1).getClientStatus());
+//                            setText(statusesList.get(item).getClientStatus());
                             setGraphic(null);
 
                             TableRow<Client> currentRow = getTableRow();
 //                            System.out.println(item);
-                            if (!isEmpty()) {
 
+//                            System.out.println(getStyle());
+//                            setBackground(Background.EMPTY);
+                            if (!isEmpty()) {
+                                tblViewClients.setStyle("-fx-background: rgba(254,82,60,0);");
                                 switch (item) {
                                     case 1:
-                                        currentRow.setStyle("-fx-background-color:#f5f5dc");
+
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(28,214,255,0.09);");
                                         break;
                                     case 2:
-                                        currentRow.setStyle("-fx-background-color:#ebf4be");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(22,165,255,0.14);");
                                         break;
                                     case 3:
-                                        currentRow.setStyle("-fx-background-color:#f5deb3");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(162,89,255,0.12);" );
                                         break;
                                     case 4:
-                                        currentRow.setStyle("-fx-background-color:#ffcc6e");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(208,255,38,0.11);");
                                         break;
                                     case 5:
-                                        currentRow.setStyle("-fx-background-color:darkseagreen");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(23,255,20,0.18);");
                                         break;
                                     case 6:
-                                        currentRow.setStyle("-fx-background-color:#77a98e");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(31,117,31,0.31);");
                                         break;
                                     case 7:
-                                        currentRow.setStyle("-fx-background-color:rgba(207,137,106,0.82)");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(199,106,18,0.24);");
                                         break;
                                     case 8:
-                                        currentRow.setStyle("-fx-background-color:#ff9d7e");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0.71);");
                                         break;
                                     case 9:
-                                        currentRow.setStyle("-fx-background-color:#fffaf5");
+                                        currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
                                         break;
+                                        default:
+                                            currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
                                 }
+
                             }
+
                         }
                     };
 
@@ -314,6 +334,20 @@ public class MainController {
 
 
         clmnContactsDepartment.setCellValueFactory(new PropertyValueFactory<Client, Integer>("statusId"));
+        clmnContactsDepartment.setCellFactory(column->{
+            return new TableCell<Client, Integer>(){
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+//                    System.out.println( departmentsList.get(item).getClientDepartment());
+//                    setText(empty ? "" : item.toString());
+                    setText(empty ? "" : departmentsList.get(item-1).getClientDepartment());
+
+                    setGraphic(null);
+
+                }
+            };
+        });
 
 
 
@@ -369,32 +403,76 @@ public class MainController {
         statusesList = statusService.getAll();
         chbStatuses.setItems(statusesList);
         chbSetStatus.setItems(statusesList);
-        showList(statusesList);
         Integer statusId = statusService.getIdByClientStatus("Всі");
-        System.err.println("statusId: " + statusId);
         if (statusId!= null)
             if (statusesList != null)
                 if (statusesList.get(statusId - 1) != null) {
                     currentStatus = statusesList.get(statusId - 1);
                     chbStatuses.setValue(currentStatus);
-                    System.err.println(currentStatus);
-
                 }
 
+                chbStatuses.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                    Integer choice = chbStatuses.getSelectionModel().getSelectedItem().getStatusId() ;
+                    String color;
+                    if (choice != null) {
+                        switch (choice){
+                            case 1:
+                                color = "-fx-control-inner-background: rgba(28,214,255,0.09);";
+                                break;
+                            case 2:
+                                color = "-fx-control-inner-background: rgba(22,165,255,0.14);";
+                                break;
+                            case 3:
+                                color ="-fx-control-inner-background: rgba(162,89,255,0.12);" ;
+                                break;
+                            case 4:
+                                color ="-fx-control-inner-background: rgba(208,255,38,0.11);";
+                                break;
+                            case 5:
+                                color ="-fx-control-inner-background: rgba(23,255,20,0.18);";
+                                break;
+                            case 6:
+                                color ="-fx-control-inner-background: rgba(31,117,31,0.31);";
+                                break;
+                            case 7:
+                                color ="-fx-control-inner-background: rgba(199,106,18,0.24);";
+                                break;
+                            case 8:
+                                color ="-fx-control-inner-background: rgba(254,82,60,0.71);";
+                                break;
+                            case 9:
+                                color ="-fx-control-inner-background: rgba(254,82,60,0);";
+                                break;
+                            default: color = "";
+                                break;
+                        }
+
+                        chbStatuses.setStyle(color);
+//                            text.setFill(Color.web(color));
+                    }
+                }
+                );
+
+                chbStatuses.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                    }
+                });
+
+//                chbStatuses.setStyle("-fx-control-inner-background: rgba(31,117,31,0.31);");
+
         departmentsList = departmentService.getAll();
-        showList(departmentsList);
         chbDepartments.setItems(departmentsList);
         chbSetDepartment.setItems(departmentsList);
 
         Integer departmentId = departmentService.getIdByClientDepartment("Всі");
-        System.err.println("departmentId: " + departmentId);
+
             if (departmentId != null)
                 if (departmentsList.get(departmentId - 1) != null) {
                     currentDepartment = departmentsList.get(departmentId - 1);
                     chbDepartments.setValue(currentDepartment);
-                    System.err.println(currentDepartment);
                 }
-        System.err.println("Current status " + currentStatus + "     current department " + currentDepartment);
+
     }
 
     private void choiseboxesSetup(){
@@ -441,7 +519,13 @@ public class MainController {
         });
 
 
+        txtAreaNewComment.addEventHandler(new EventType<>(), new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
 
+
+            }
+        });
         txtAreaNewComment.setOnKeyTyped(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -702,5 +786,28 @@ public class MainController {
     public void miCloseOnAction(){
 
         mainStage.close();
+    }
+
+    public void newCommentOnKeyPressed(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER ){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    txtAreaNewComment.positionCaret(0);
+                }
+            });
+            btnAddHistoryOnAction();
+        }
+    }
+
+    public void fldChildNameOnKeyPressed(KeyEvent event){
+
+    }
+
+    public void gridNewClientOnKeyPressed(KeyEvent event){
+        if(event.getCode() == KeyCode.ENTER ){
+            System.out.println("Enter pressed");
+            btnSaveContactOnAction();
+        }
     }
 }

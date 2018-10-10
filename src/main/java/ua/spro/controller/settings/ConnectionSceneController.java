@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import ua.spro.controller.SettingsController;
 import ua.spro.entity.DBConnection;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.util.ConnectionDBUtil;
@@ -26,7 +27,9 @@ public class ConnectionSceneController {
     @FXML private Label labelConnectionStatus;
     @FXML private Label labelSaveStatus;
     private ObservableList<DBConnection> connections;
+    private ObservableList<DBConnection> prevConnections;
     private DBConnection currentConnection;
+    private DBConnection prevCurrentConnection;
     private DBConnection newConnection;
 
     private static final String urlBegin = "jdbc:mysql://";
@@ -38,9 +41,19 @@ public class ConnectionSceneController {
     private String url;
     private ClientServiceImpl clientService;
 
+    private SettingsController settingsController;
+
+
+    public SettingsController getSettingsController() {
+        return settingsController;
+    }
+
+    public void setSettingsController(SettingsController settingsController) {
+        this.settingsController = settingsController;
+    }
 
     public ConnectionSceneController() {
-        System.out.println("connection scene controller constructor");
+
     }
 
     private void chbConnectionsOnAction(){
@@ -65,10 +78,12 @@ public class ConnectionSceneController {
 
     private void choiseBoxSetup(){
         connections = ConnectionDBUtil.loadSavedConnectionsList();
+        prevConnections = connections;
         if(connections!=null) {
             chbConnections.setItems(connections);
             if(!connections.isEmpty()) {
                 currentConnection = connections.get(0);
+                prevCurrentConnection = currentConnection;
             }
             if(currentConnection != null) {
                 chbConnections.setValue(currentConnection);
@@ -107,7 +122,7 @@ public class ConnectionSceneController {
 
     private void buildUrl(){
         String result = urlBegin + host + ":" + port + "/" + dataBase;
-        System.out.println("build url: " + result);
+//        System.out.println("build url: " + result);
         fldURL.setText(result);
     }
 
@@ -116,7 +131,7 @@ public class ConnectionSceneController {
         choiseBoxSetup();
         textFieldsSetup();
         clientService = new ClientServiceImpl();
-        System.out.println("initialize connection properties");
+//        System.out.println("initialize connection properties");
 
     }
 
@@ -140,6 +155,7 @@ public class ConnectionSceneController {
 
         }
         labelSaveStatus.setVisible(true);
+        settingsController.getBtnApply().setDisable(false);
     }
 
 
@@ -173,6 +189,7 @@ public class ConnectionSceneController {
             currentConnection = newConnection;
             chbConnections.setValue(currentConnection);
             labelSaveStatus.setVisible(true);
+            settingsController.getBtnApply().setDisable(false);
         }
 
     }
@@ -200,7 +217,18 @@ public class ConnectionSceneController {
 
             ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
 
-
     }
 
+    public void cancel(){
+        currentConnection = prevCurrentConnection;
+        connections = prevConnections;
+        ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
+        System.out.println(currentConnection);
+        ConnectionDBUtil.getInstance().setLogin(currentConnection.getUser());
+        ConnectionDBUtil.getInstance().setPassword(currentConnection.getPassword());
+        ConnectionDBUtil.getInstance().setUrl(currentConnection.getFullURL());
+        choiseBoxSetup();
+        System.out.println("url changed to " + ConnectionDBUtil.getInstance().getUrl());
+
+    }
 }

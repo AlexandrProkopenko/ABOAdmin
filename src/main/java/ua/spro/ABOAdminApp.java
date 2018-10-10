@@ -29,7 +29,7 @@ public class ABOAdminApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         mainStage = primaryStage;
         mainStage.setTitle("ABO Admin");
-        mainStage.setResizable(false);
+//        mainStage.setResizable(false);
 
         FXMLLoader mainLoader = new FXMLLoader();
         mainLoader.setLocation(getClass().getResource("/ua/spro/fxml/mainform.fxml"));
@@ -38,7 +38,8 @@ public class ABOAdminApp extends Application {
         mainStage.setScene(new Scene(root));
         mainController = mainLoader.getController();
         mainController.setMainStage(mainStage);
-
+        mainStage.setMinWidth(1200);
+        mainStage.setMinHeight(650);
 
 
 
