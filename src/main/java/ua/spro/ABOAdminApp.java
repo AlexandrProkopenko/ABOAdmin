@@ -1,18 +1,15 @@
 package ua.spro;
 
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ua.spro.controller.MainController;
 import ua.spro.controller.SettingsController;
+import ua.spro.controller.main.AdminController;
 
 public class ABOAdminApp extends Application {
 
@@ -21,6 +18,9 @@ public class ABOAdminApp extends Application {
 
     public static Stage settingsStage;
     public static SettingsController settingsController;
+
+    public static Stage adminStage;
+    public static AdminController adminController;
 
     public static void main(String[] args) {
         launch(args);
@@ -37,7 +37,7 @@ public class ABOAdminApp extends Application {
 
         mainStage.setScene(new Scene(root));
         mainController = mainLoader.getController();
-        mainController.setMainStage(mainStage);
+//        mainController.setMainStage(mainStage);
         mainStage.setMinWidth(1200);
         mainStage.setMinHeight(650);
 
@@ -53,7 +53,7 @@ public class ABOAdminApp extends Application {
         settingsStage.setResizable(false);
         settingsStage.initModality(Modality.APPLICATION_MODAL);
         FXMLLoader settingsLoader = new FXMLLoader();
-        settingsLoader.setLocation(getClass().getResource("/ua/spro/fxml/settingsform.fxml"));
+        settingsLoader.setLocation(getClass().getResource("/ua/spro/fxml/settings/settingsform.fxml"));
         Parent settingsRoot = settingsLoader.load();
 
         settingsStage.setScene(new Scene(settingsRoot));

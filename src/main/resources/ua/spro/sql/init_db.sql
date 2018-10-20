@@ -65,3 +65,17 @@ insert into statuses values(null, 'Старички');
 insert into statuses values(null, 'Ходили раніше');
 insert into statuses values(null, 'Відмовились');
 insert into statuses values(null, 'Всі');
+
+# use abo;
+create table users
+(
+  duser_id int auto_increment
+    primary key,
+  login varchar(30) not null,
+  user_password varchar(30) not null
+);
+insert into users values(null, 'Spro', '1111');
+insert into users values(null, 'Orest', 'orest');
+insert into users values(null, 'Eva', 'eva');
+insert into users values(null, 'Love', 'love');
+insert into users values(null, 'Marina', 'marina');

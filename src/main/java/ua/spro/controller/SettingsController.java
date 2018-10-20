@@ -22,8 +22,8 @@ public class SettingsController {
     private TreeItem<String> connectionMenuItem;
     private TreeItem<String> newMenuItem;
     private TreeItem<String> rootMenuItem;
-    private static final String connectionFXMLPath = "/ua/spro/fxml/connectionscene.fxml";
-    private static final String fooFXMLPath = "/ua/spro/fxml/foo.fxml";
+    private static final String connectionFXMLPath = "/ua/spro/fxml/settings/connectionscene.fxml";
+    private static final String fooFXMLPath = "/ua/spro/fxml/settings/foo.fxml";
     private Parent connectionRoot;
     private Parent fooRoot;
     private FXMLLoader connectionLoader;
@@ -52,8 +52,10 @@ public class SettingsController {
         rootMenuItem.getChildren().add(newMenuItem);
         subScene.setRoot(connectionRoot);
         selectedItem = connectionMenuItem;
+
         treeViewMenu.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedItem = newValue;
+
             switch (newValue.getValue()){
                 case "З'єднання":
 

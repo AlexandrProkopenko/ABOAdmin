@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="50.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.users.NewUserSceneController">
+   <children>
+      <Label layoutX="404.0" layoutY="1.0" prefHeight="27.0" prefWidth="81.0" text="Створити" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button defaultButton="true" layoutX="381.0" layoutY="15.0" mnemonicParsing="false" onAction="#btnCreateOnAction" prefHeight="25.0" prefWidth="35.0" text="Ок" AnchorPane.bottomAnchor="0.0" />
+      <Button layoutX="436.0" layoutY="15.0" mnemonicParsing="false" onAction="#btnCancelOnaction" prefHeight="25.0" prefWidth="64.0" text="Відміна" AnchorPane.bottomAnchor="0.0" />
+      <PasswordField fx:id="fldPassword" layoutX="159.0" layoutY="33.0" prefHeight="25.0" prefWidth="100.0" />
+      <PasswordField fx:id="fldConfirmPassword" layoutX="266.0" layoutY="34.0" prefHeight="25.0" prefWidth="100.0" />
+      <TextField fx:id="fldLogin" layoutY="33.0" />
+      <Label layoutY="6.0" text="Логін" />
+      <Label layoutX="159.0" layoutY="6.0" text="Пароль" />
+      <Label layoutX="266.0" layoutY="6.0" text="Повтор пароля" />
+   </children>
+</AnchorPane>

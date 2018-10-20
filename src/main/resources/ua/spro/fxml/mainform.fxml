@@ -1,143 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Point3D?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.SubScene?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Region?>
 
-
-<AnchorPane prefHeight="801.0" prefWidth="1273.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.MainController">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="801.0" prefWidth="1273.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.MainController">
    <children>
-      <TabPane layoutY="25.0" prefHeight="783.0" prefWidth="1273.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
-        <tabs>
-          <Tab text="Untitled Tab 1">
-               <content>
-                  <AnchorPane minHeight="530.0" minWidth="1200.0" prefHeight="775.0" prefWidth="1211.0" styleClass="table-view">
-                     <children>
-                        <TableView fx:id="tblViewClients" editable="true" layoutY="93.0" onKeyTyped="#tblViewClientsOnKeyTyped" onMouseClicked="#tblViewClientsOnMouseClicked" prefHeight="613.0" prefWidth="727.0" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="517.0" AnchorPane.topAnchor="92.0">
-                           <columns>
-                              <TableColumn fx:id="clmnContactsId" maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="-1.0" text="№" />
-                              <TableColumn fx:id="clmnContactsDepartment" maxWidth="1.7976931348623157E308" minWidth="60.0" prefWidth="-1.0" text="Філія" />
-                              <TableColumn fx:id="clmnContactsStatus" maxWidth="1.7976931348623157E308" minWidth="90.0" prefWidth="-1.0" text="Статус" />
-                              <TableColumn fx:id="clmnContactsChildName" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" text="Ім'я дитини" />
-                              <TableColumn fx:id="clmnContactsAge" maxWidth="1.7976931348623157E308" minWidth="30.0" prefWidth="-1.0" text="Вік" />
-                              <TableColumn fx:id="clmnContactsBirthday" maxWidth="1.7976931348623157E308" minWidth="70.0" prefWidth="-1.0" text="Дата народження" />
-                              <TableColumn fx:id="clmnContactsParentName" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="-1.0" text="ФІО батьків" />
-                              <TableColumn fx:id="clmnContactsPhone" maxWidth="1.7976931348623157E308" minWidth="120.0" prefWidth="120.0" text="Номер телефону" />
-                              <TableColumn fx:id="clmnContactsLocation" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="120.0" text="Район" />
-                           </columns>
-                        </TableView>
-                        <GridPane layoutX="15.0" layoutY="594.0" onKeyPressed="#gridNewClientOnKeyPressed" prefHeight="55.0" prefWidth="622.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="486.0">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="10.0" prefWidth="152.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="130.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="125.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="123.0" minWidth="10.0" prefWidth="118.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="94.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <TextField fx:id="fldChildName" onKeyPressed="#fldChildNameOnKeyPressed" />
-                              <DatePicker fx:id="dpBirthday" prefHeight="25.0" prefWidth="132.0" GridPane.columnIndex="1" />
-                              <TextField fx:id="fldParentName" GridPane.columnIndex="2" />
-                              <TextField fx:id="fldPhone" GridPane.columnIndex="3" />
-                              <TextField fx:id="fldLocation" GridPane.columnIndex="4" />
-                              <Button defaultButton="true" mnemonicParsing="false" onAction="#btnSaveContactOnAction" text="Зберегти" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                           </children>
-                        </GridPane>
-                        <Label layoutX="1050.0" layoutY="42.0" text="Історія" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="42.0">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                        <TableView fx:id="tblViewHistories" layoutX="651.0" layoutY="96.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" onMouseClicked="#tblViewHistoriesOnMouseClicked" onMouseEntered="#tblViewHistoriesOnMouseEntered" onMouseExited="#tblViewHistoriesOnMouseExited" prefHeight="289.0" prefWidth="467.0" AnchorPane.bottomAnchor="302.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="95.0">
-                           <columns>
-                              <TableColumn fx:id="clmnHistoriesDate" prefWidth="122.0" text="Дата" />
-                              <TableColumn fx:id="clmnHistoriesComment" prefWidth="289.0" text="Коментар" />
-                           </columns>
-                           <rotationAxis>
-                              <Point3D y="1.0" />
-                           </rotationAxis>
-                        </TableView>
-                        <TextArea fx:id="txtAreaNewComment" layoutX="651.0" layoutY="399.0" onKeyPressed="#newCommentOnKeyPressed" prefHeight="82.0" prefWidth="467.0" wrapText="true" AnchorPane.bottomAnchor="205.0" AnchorPane.rightAnchor="8.0" />
-                        <Button defaultButton="true" layoutX="1065.0" layoutY="481.0" mnemonicParsing="false" onAction="#btnAddHistoryOnAction" text="Додати" AnchorPane.bottomAnchor="180.0" AnchorPane.rightAnchor="4.0" />
-                        <GridPane layoutX="16.0" layoutY="29.0" prefHeight="55.0" prefWidth="622.0" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="29.0">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="81.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="62.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="210.0" minWidth="10.0" prefWidth="148.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="152.0" minWidth="10.0" prefWidth="52.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="210.0" minWidth="10.0" prefWidth="187.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label prefHeight="21.0" prefWidth="97.0" text="Контакти" GridPane.columnIndex="5">
-                                 <font>
-                                    <Font name="System Bold" size="20.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="10.0" layoutY="14.0" prefHeight="21.0" prefWidth="97.0" text="Філія" GridPane.columnIndex="3">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="508.0" layoutY="14.0" prefHeight="21.0" prefWidth="97.0" text="Статус" GridPane.columnIndex="1">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Label>
-                              <ChoiceBox fx:id="chbStatuses" prefHeight="25.0" prefWidth="139.0" GridPane.columnIndex="2" />
-                              <ChoiceBox fx:id="chbDepartments" prefWidth="150.0" GridPane.columnIndex="4" />
-                              <ImageView fx:id="imViewLogo" blendMode="DARKEN" fitHeight="69.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" />
-                           </children>
-                        </GridPane>
-                        <GridPane layoutX="651.0" layoutY="506.0" prefHeight="90.0" prefWidth="467.0" AnchorPane.bottomAnchor="90.0" AnchorPane.rightAnchor="7.0">
-                           <columnConstraints>
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="296.0" minWidth="10.0" prefWidth="296.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="171.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <ChoiceBox fx:id="chbSetStatus" prefWidth="150.0" GridPane.rowIndex="1" />
-                              <ChoiceBox fx:id="chbSetDepartment" prefWidth="150.0" GridPane.rowIndex="2" />
-                              <Button defaultButton="true" mnemonicParsing="false" onAction="#btnSetStatusOnAction" prefWidth="120.0" text="Присвоїти статус" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Button defaultButton="true" mnemonicParsing="false" onAction="#btnSetDepartmentOnAction" prefWidth="120.0" text="Перенести у філію" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                           </children>
-                        </GridPane>
-                        <Button fx:id="btn" layoutX="650.0" layoutY="481.0" mnemonicParsing="false" onAction="#ButtonOnAction" text="Button" AnchorPane.bottomAnchor="180.0" AnchorPane.rightAnchor="423.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-          <Tab text="Untitled Tab 2" />
-        </tabs>
-      </TabPane>
       <MenuBar>
          <menus>
             <Menu mnemonicParsing="false" text="File">
@@ -159,5 +32,22 @@
             </Menu>
          </menus>
       </MenuBar>
+      <ToggleButton fx:id="btnAdminScene" layoutX="999.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnAdminOnAction" text="Адміністрування" AnchorPane.rightAnchor="185.0">
+         <toggleGroup>
+            <ToggleGroup fx:id="q" />
+         </toggleGroup>
+      </ToggleButton>
+      <ToggleButton fx:id="btnVisitScene" layoutX="1088.0" layoutY="14.0" mnemonicParsing="false" text="Відмічання" toggleGroup="$q" AnchorPane.rightAnchor="95.0" />
+      <ToggleButton layoutX="1177.0" layoutY="14.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$q" AnchorPane.rightAnchor="7.0" />
+      <SubScene fx:id="subScene" height="750.0" layoutY="50.0" width="1273.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+        <root>
+          <Region />
+        </root>
+      </SubScene>
+      <SubScene fx:id="subSceneUser" height="50.0" layoutX="295.0" layoutY="4.0" width="500.0" AnchorPane.topAnchor="0.0">
+        <root>
+          <Region />
+        </root>
+      </SubScene>
    </children>
 </AnchorPane>

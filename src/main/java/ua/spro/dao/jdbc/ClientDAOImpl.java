@@ -207,11 +207,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        System.out.println("inDao");
-//        for(Client n: list){
-//            System.out.println(n);
-//            System.out.println("ddd");
-//        }
         return list;
     }
 
