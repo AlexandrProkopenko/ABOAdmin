@@ -66,10 +66,11 @@ insert into statuses values(null, 'Ходили раніше');
 insert into statuses values(null, 'Відмовились');
 insert into statuses values(null, 'Всі');
 
-# use abo;
+use abo;
+drop table users;
 create table users
 (
-  duser_id int auto_increment
+  user_id int auto_increment
     primary key,
   login varchar(30) not null,
   user_password varchar(30) not null

@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean save(User user) {
+    public Integer save(User user) {
         return dao.save(user);
     }
 
@@ -37,5 +37,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public ObservableList<User> getAll() {
         return dao.getAll();
+    }
+
+    @Override
+    public User getUserWithId(User user) {
+        return dao.getUserWithId(user);
     }
 }

@@ -1,9 +1,28 @@
 package ua.spro.entity;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private Integer userId;
     private String login;
     private String password;
+
+    public User() {
+    }
+
+    public User(SubUser subUser) {
+        userId = subUser.getUserId();
+        login = subUser.getLogin();
+        password = subUser.getPassword();
+    }
+
+
+
+    public User(Integer userId, String login, String password) {
+        this.userId = userId;
+        this.login = login;
+        this.password = password;
+    }
 
     public User(String login, String password) {
         this.login = login;

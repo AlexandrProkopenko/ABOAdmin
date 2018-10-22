@@ -1278,7 +1278,7 @@
       <ColNames>status_id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="315" parent="285" name="duser_id">
+    <column id="315" parent="285" name="user_id">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
@@ -1299,7 +1299,7 @@
     </column>
     <key id="318" parent="285" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
-      <ColNames>duser_id</ColNames>
+      <ColNames>user_id</ColNames>
       <Primary>1</Primary>
     </key>
   </database-model>

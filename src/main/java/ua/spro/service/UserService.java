@@ -6,7 +6,7 @@ import ua.spro.entity.User;
 public interface UserService {
 
 
-    boolean save(User user);
+    Integer save(User user);
 
     User getById(Integer id);
 
@@ -15,4 +15,6 @@ public interface UserService {
     boolean delete(User user);
 
     ObservableList<User> getAll();
+
+    User getUserWithId(User user);
 }

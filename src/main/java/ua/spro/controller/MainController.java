@@ -14,13 +14,17 @@ import ua.spro.controller.main.AdminController;
 import ua.spro.controller.users.InUserSceneController;
 import ua.spro.controller.users.NewUserSceneController;
 import ua.spro.controller.users.NoUserSceneController;
+import ua.spro.model.UserModel;
+import ua.spro.model.UserState;
 
 
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 
 import static ua.spro.ABOAdminApp.mainStage;
 
-public class MainController {
+public class MainController implements Observer {
 
     private AdminController adminController;
 
@@ -44,6 +48,7 @@ public class MainController {
     private InUserSceneController inUserController;
     private NoUserSceneController noUserController;
     private NewUserSceneController newUserController;
+    private UserModel userModel;
     
 
     //  subscene for changing user authorization
@@ -70,6 +75,7 @@ public class MainController {
             inUserController = inUserLoader.getController();
             inUserController.setMainController(this);
 
+
             noUserLoader.setLocation(getClass().getResource(noUserFXMLPath));
             noUserRoot = noUserLoader.load();
             noUserController = noUserLoader.getController();
@@ -84,12 +90,31 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        subSceneUser.setVisible(true);
+    }
 
+    private void userModelSetup(){
+        userModel = new UserModel();
+        userModel.addObserver(this);
+
+        inUserController.setUserModel(userModel);
+        noUserController.setUserModel(userModel);
+        newUserController.setUserModel(userModel);
+
+        userModel.addObserver(inUserController);
+        userModel.addObserver(newUserController);
+        userModel.addObserver(noUserController);
+        userModel.changeState();
+
+
+        noUserController.lateInitialization();
     }
 
     public void initialize(){
+
         loadScenes();
         panelSetup();
+        userModelSetup();
     }
 
     private void panelSetup(){
@@ -128,5 +153,28 @@ public class MainController {
 
     public void btnAdminOnAction(){
         subScene.setRoot(adminRoot);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        System.out.println("Main controller update");
+        if(o instanceof UserModel){
+
+            if(userModel.getUserState() == UserState.NOT_ENTERED){
+                subSceneUser.setRoot(noUserRoot);
+                subScene.setDisable(true);
+
+            }else if(userModel.getUserState() == UserState.ENTERED){
+                subSceneUser.setRoot(inUserRoot);
+                subScene.setDisable(false);
+            }else if(userModel.getUserState() == UserState.CREATING_NEW){
+                subSceneUser.setRoot(newUserRoot);
+//                newUserController
+
+            }else if(userModel.getUserState() == UserState.EDITING){
+                subSceneUser.setRoot(newUserRoot);
+            }
+
+        }
     }
 }
