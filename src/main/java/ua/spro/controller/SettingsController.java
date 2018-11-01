@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import ua.spro.ABOAdminApp;
+import ua.spro.controller.main.AdminController;
 import ua.spro.controller.settings.ConnectionSceneController;
 
 import java.io.IOException;
@@ -28,15 +29,13 @@ public class SettingsController {
     private Parent fooRoot;
     private FXMLLoader connectionLoader;
     private ConnectionSceneController connectionSceneController;
+
     private TreeItem<String> selectedItem;
+
 
 
     public Button getBtnApply() {
         return btnApply;
-    }
-
-    public void setBtnApply(Button btnApply) {
-        this.btnApply = btnApply;
     }
 
     private void treeViewSetup(){
@@ -113,7 +112,7 @@ public class SettingsController {
     void btnCancelOnAction(ActionEvent event) {
         switch (selectedItem .getValue()){
             case "З'єднання":
-                connectionSceneController.cancel();
+//                connectionSceneController.cancel();
                 btnApply.setDisable(true);
                 break;
             case "foo":
@@ -128,7 +127,10 @@ public class SettingsController {
 
     @FXML
     void btnOkOnAction(ActionEvent event) {
-        btnApplyOnAction();
+        if(!btnApply.isDisable()) {
+            btnApplyOnAction();
+            System.out.println("applied");
+        }
         ABOAdminApp.settingsStage.close();
     }
 

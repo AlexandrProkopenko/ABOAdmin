@@ -11,10 +11,10 @@ public class EditClientAction implements UserAction {
         description = new StringBuilder();
         description.
                 append("Змінено інфо клієнта. Нові дані: \n").
-                append(newValue).
+                append(newValue.getDescription()).
                 append("\n").
                 append("Попередні дані\n").
-                append(oldValue);
+                append(oldValue.getDescription());
     }
 
     @Override

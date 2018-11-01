@@ -1,8 +1,6 @@
 package ua.spro.controller.main;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,11 +19,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import ua.spro.ABOAdminApp;
 import ua.spro.controller.MainController;
-import ua.spro.entity.Client;
-import ua.spro.entity.Department;
-import ua.spro.entity.History;
-import ua.spro.entity.Status;
+import ua.spro.entity.*;
+import ua.spro.model.admin.AdminModel;
+import ua.spro.model.admin.AdminModelInterface;
+import ua.spro.model.user.UserModel;
+import ua.spro.model.user.UserModelInterface;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.service.impl.DepartmentServiceImpl;
 import ua.spro.service.impl.HistoryServiceImpl;
@@ -43,8 +43,7 @@ public class AdminController {
     @FXML private AnchorPane rootAnchorPane;
 
     //поля вводу данних нового користувача
-    @FXML
-    private TextField fldChildName;
+    @FXML private TextField fldChildName;
     @FXML private DatePicker dpBirthday;
     @FXML private TextField fldParentName;
     @FXML private TextField fldPhone;
@@ -52,7 +51,7 @@ public class AdminController {
     //поле вводу нового коментара
     @FXML private TextArea txtAreaNewComment;
     // таблиця клієнтів і її колонки
-    private ObservableList<Client> clientsList;
+
     @FXML private TableView<Client> tblViewClients;
     @FXML private TableColumn<Client, Void> clmnContactsId;
     @FXML private TableColumn<Client, String> clmnContactsChildName;
@@ -66,72 +65,115 @@ public class AdminController {
     @FXML private TableColumn<Client, Integer> clmnContactsStatus;
 
     //таблиця історії коментарів і її колонки
-    private ObservableList<History> historiesList;
+
     @FXML private TableView<History> tblViewHistories;
     @FXML private TableColumn<History, LocalDateTime> clmnHistoriesDate;
     @FXML private TableColumn<History, String> clmnHistoriesComment;
+    @FXML private TableColumn<History, Integer> clmnHistoriesAuthor;
     //чойз бокси фільтрації за статусом і присвоєння нового статусу
-    private ObservableList<Status> statusesList;
+
     @FXML private ChoiceBox<Status> chbStatuses;
     @FXML private ChoiceBox<Status> chbSetStatus;
 
-    private ObservableList<Department> departmentsList;
+
     @FXML private ChoiceBox<Department> chbDepartments;
     @FXML private ChoiceBox<Department> chbSetDepartment;
 
     @FXML private ImageView imViewLogo;
     @FXML private Button btn;
 
-    //сервіси звернень до бази данних
-    private ClientServiceImpl clientService;
-    private HistoryServiceImpl historyService;
-    private StatusServiceImpl statusService;
-    private DepartmentServiceImpl departmentService;
-    //локальні змінні класу
+    private AdminModelInterface adminModel;
+
     private Client currentClient;
     private String newComment;
     private Status currentStatus;
-    private Status newStatus;
+    private Status filterStatus;
     private Department currentDepartment;
+    private Department filterDepartment;
+    private History currentHistory;
+
+
+    private ObservableList<Client> selectedClients;
+    private ObservableList<Client> clientsList;
+    private ObservableList<Status> statusesList;
+    private ObservableList<History> historiesList;
+    private ObservableList<Department> departmentsList;
+
+    private Status newStatus;
     private Department newDepartment;
     private Tooltip currentTooltip;
-    private History currentHistory;
-    private ObservableList<Client> selectedClients;
 
-    private Stage mainStage;
-    private ReadExcelUtil excelUtil;
+    private UserModelInterface userModel;
+    private User currentUser;
+    private ObservableList<User> users;
+
 
     private MainController mainController;
+    private Stage mainStage;
 
-    public MainController getMainController() {
-        return mainController;
+    public void setMainStage(Stage mainStage) {
+        this.mainStage = mainStage;
     }
 
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
 
-    public Stage getMainStage() {
-        return mainStage;
+
+    public void initialize(){
+            adminModel = ABOAdminApp.getAdminModel();
+            userModel = ABOAdminApp.getUserModel();
+            currentUser = userModel.getCurrentUser();
+            users = userModel.getAllUsers();
+
+        dataSetup();
+        clientTableSetup();
+        historyTableSetup();
+        choiseboxesSetup();
+        loadLogo();
+        System.out.println("setUp compleeted!");
+
+
+        ABOAdminApp.adminController = this;
     }
 
-    public void setMainStage(Stage mainStage) {
-        this.mainStage = mainStage;
-    }
-
-    private void showList(List list){
-        for(Object o : list){
-            System.out.println(o);
+    private void setCurrents(){
+        if(clientsList!=null) {
+            if(!clientsList.isEmpty())
+            currentClient = clientsList.get(0);
+        }
+        if(statusesList!=null){
+            if(!statusesList.isEmpty())
+            for (Status s : statusesList) {
+                if (s.getClientStatus().equals("Всі")) {
+                    currentStatus = s;
+                }
+            }
+        }
+        if(departmentsList!=null) {
+            if(!departmentsList.isEmpty())
+            for (Department dep : departmentsList) {
+                if (dep.getClientDepartment().equals("Всі")) {
+                    currentDepartment = dep;
+                }
+            }
         }
     }
 
+    private void dataSetup(){
+        clientsList = adminModel.getClientsList();
+        statusesList = adminModel.getStatusesList();
+        historiesList = adminModel.getHistoriesList();
+        departmentsList = adminModel.getDepartmentsList();
+
+        setCurrents();
+    }
+
     private void fillClientData(){
-        clientsList = clientService.getAll();
         tblViewClients.setItems(clientsList);
     }
 
     private void clientTableSetup(){
-
         //звязування колонок таблиці з класами
         clmnContactsId.setCellValueFactory(new PropertyValueFactory<Client, Void>("№"));
         clmnContactsId.setCellFactory(col -> new TableCell<Client, Void>() {
@@ -148,8 +190,6 @@ public class AdminController {
 
         });
 
-
-
         clmnContactsChildName.setCellValueFactory(new PropertyValueFactory<Client, String>("childName"));
         clmnContactsChildName.setCellFactory(column -> {
             return new TableCell<Client, String>(){
@@ -158,31 +198,18 @@ public class AdminController {
                     super.updateItem(item, empty);
                     setText(empty ? "" : getItem().toString());
                     setGraphic(null);
-
-                    TableRow<Client> currentRow = getTableRow();
-//                    currentRow.getTableView().get
-//                    if (!isEmpty()) {
-//
-//                        if(item.equals("Маша"))
-//                            currentRow.setStyle("-fx-background-color:lightcoral");
-//                        else
-//                            currentRow.setStyle("-fx-background-color:lightgreen");
-//                    }
                 }
             };
         });
 
-
-
         clmnContactsChildName.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, String> event) {
-//                    ((Client) event.getTableView().getItems().get(event.getTablePosition().getRow())).setChildName(event.getNewValue());
-                String newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setChildName(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
+                String newNameValue = event.getNewValue();
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setChildName(newNameValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
             }
         });
         clmnContactsChildName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
@@ -202,12 +229,14 @@ public class AdminController {
         clmnContactsAge.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, Double>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, Double> event) {
-                Double newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setAge(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
-                tblViewClients.refresh();
+                Double newAgeValue = event.getNewValue();
+
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setAge(newAgeValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+
+//                tblViewClients.refresh();
             }
         });
         clmnContactsBirthday.setCellValueFactory(new PropertyValueFactory<Client, LocalDate>("birthday"));
@@ -228,12 +257,14 @@ public class AdminController {
         clmnContactsBirthday.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, LocalDate>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, LocalDate> event) {
-                LocalDate newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setBirthday(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
-                tblViewClients.refresh();
+                LocalDate newDateValue = event.getNewValue();
+
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setBirthday(newDateValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+
+//                tblViewClients.refresh();
 
             }
         });
@@ -242,11 +273,12 @@ public class AdminController {
         clmnContactsParentName.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, String> event) {
-                String newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setParentName(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
+                String newParentValue = event.getNewValue();
+
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setParentName(newParentValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
             }
         });
         clmnContactsParentName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
@@ -256,11 +288,13 @@ public class AdminController {
         clmnContactsPhone.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, String> event) {
-                String newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setPhone(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
+                String newPhoneValue = event.getNewValue();
+
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setPhone(newPhoneValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+
             }
         });
         clmnContactsLocation.setCellValueFactory(new PropertyValueFactory<Client, String>("location"));
@@ -268,28 +302,37 @@ public class AdminController {
         clmnContactsLocation.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Client, String> event) {
-                String newValue = event.getNewValue();
-                currentClient = tblViewClients.getSelectionModel().getSelectedItem();
-                currentClient.setLocation(newValue);
-                System.out.println(currentClient);
-                clientService.update(currentClient);
+                String newLocationValue = event.getNewValue();
+
+                Client oldValue = tblViewClients.getSelectionModel().getSelectedItem();
+                Client newValue = new Client(oldValue);
+                newValue.setLocation(newLocationValue);
+                adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+
             }
         });
-        clmnContactsStatus.setCellValueFactory(new PropertyValueFactory<Client, Integer>("departmentId"));
+
+        clmnContactsDepartment.setCellValueFactory(new PropertyValueFactory<Client, Integer>("departmentId"));
+        clmnContactsDepartment.setCellFactory(column->{
+            return new TableCell<Client, Integer>(){
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? "" : departmentsList.get(item-1).getClientDepartment());
+                    setGraphic(null);
+                }
+            };
+        });
+
+        clmnContactsStatus.setCellValueFactory(new PropertyValueFactory<Client, Integer>("statusId"));
         clmnContactsStatus.setCellFactory(column -> {
             return new TableCell<Client, Integer>() {
                 @Override
                 protected void updateItem(Integer item, boolean empty) {
                     super.updateItem(item, empty);
                     setText(empty ? "" : statusesList.get(item-1).getClientStatus());
-//                            setText(statusesList.get(item).getClientStatus());
                     setGraphic(null);
-
                     TableRow<Client> currentRow = getTableRow();
-//                            System.out.println(item);
-
-//                            System.out.println(getStyle());
-//                            setBackground(Background.EMPTY);
                     if (!isEmpty()) {
                         tblViewClients.setStyle("-fx-background: rgba(254,82,60,0);");
                         switch (item) {
@@ -324,34 +367,11 @@ public class AdminController {
                             default:
                                 currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
                         }
-
                     }
-
                 }
             };
 
         });
-
-
-        clmnContactsDepartment.setCellValueFactory(new PropertyValueFactory<Client, Integer>("statusId"));
-        clmnContactsDepartment.setCellFactory(column->{
-            return new TableCell<Client, Integer>(){
-                @Override
-                protected void updateItem(Integer item, boolean empty) {
-                    super.updateItem(item, empty);
-//                    System.out.println( departmentsList.get(item).getClientDepartment());
-//                    setText(empty ? "" : item.toString());
-                    setText(empty ? "" : departmentsList.get(item-1).getClientDepartment());
-
-                    setGraphic(null);
-
-                }
-            };
-        });
-
-
-
-
 
 
 
@@ -359,8 +379,9 @@ public class AdminController {
 
         fillClientData();
         tblViewClients.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        selectedClients = FXCollections.observableArrayList();
+//        selectedClients = FXCollections.observableArrayList();
         tblViewClients.setEditable(true);
+        clmnContactsChildName.setEditable(true);
     }
 
     private void historyTableSetup(){
@@ -386,92 +407,100 @@ public class AdminController {
         clmnHistoriesComment.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<History, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<History, String> event) {
-                String newValue = event.getNewValue();
-                currentHistory = tblViewHistories.getSelectionModel().getSelectedItem();
-                currentHistory.setComment(newValue);
-                System.out.println(currentHistory);
-                historyService.update(currentHistory);
+                System.out.println("row value "+event.getRowValue());
+                adminModel.editComment(
+                        currentClient,
+                        event.getRowValue(),
+                        event.getOldValue(),
+                        event.getNewValue(),
+                        userModel.getCurrentUser()
+                );
             }
         });
+
+        clmnHistoriesAuthor.setCellValueFactory(new PropertyValueFactory<History, Integer>("userId"));
+        clmnHistoriesAuthor.setCellFactory(column -> {
+            return new TableCell<History, Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+//                    System.out.println("Author cell: " + item);
+//                    System.out.println(userModel);
+//                    System.out.println(userModel.getAllUsers());
+//                    System.out.println(userModel.getAllUsers().get(item-1));
+//                    setText(empty ? "" : userModel.getAllUsers().get(item-1).getLogin());
+//                    String text = userModel.getAllUsers().get(item).getLogin();
+//                    System.out.println(text);
+                    setText(empty ? "" : users.get(item-1).getLogin());
+                }
+        }; });
+
+
         currentTooltip = new Tooltip();
         tblViewHistories.setTooltip(currentTooltip);
         tblViewHistories.setEditable(true);
-
+        tblViewHistories.setItems(historiesList);
     }
 
     private void fillChoiseBoxes(){
-        statusesList = statusService.getAll();
+
+
         chbStatuses.setItems(statusesList);
         chbSetStatus.setItems(statusesList);
-        Integer statusId = statusService.getIdByClientStatus("Всі");
-        if (statusId!= null)
-            if (statusesList != null)
-                if (statusesList.get(statusId - 1) != null) {
-                    currentStatus = statusesList.get(statusId - 1);
-                    chbStatuses.setValue(currentStatus);
-                }
+        chbStatuses.setValue(currentStatus);
+
 
         chbStatuses.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                    Integer choice = chbStatuses.getSelectionModel().getSelectedItem().getStatusId() ;
-                    String color;
-                    if (choice != null) {
-                        switch (choice){
-                            case 1:
-                                color = "-fx-control-inner-background: rgba(28,214,255,0.09);";
-                                break;
-                            case 2:
-                                color = "-fx-control-inner-background: rgba(22,165,255,0.14);";
-                                break;
-                            case 3:
-                                color ="-fx-control-inner-background: rgba(162,89,255,0.12);" ;
-                                break;
-                            case 4:
-                                color ="-fx-control-inner-background: rgba(208,255,38,0.11);";
-                                break;
-                            case 5:
-                                color ="-fx-control-inner-background: rgba(23,255,20,0.18);";
-                                break;
-                            case 6:
-                                color ="-fx-control-inner-background: rgba(31,117,31,0.31);";
-                                break;
-                            case 7:
-                                color ="-fx-control-inner-background: rgba(199,106,18,0.24);";
-                                break;
-                            case 8:
-                                color ="-fx-control-inner-background: rgba(254,82,60,0.71);";
-                                break;
-                            case 9:
-                                color ="-fx-control-inner-background: rgba(254,82,60,0);";
-                                break;
-                            default: color = "";
-                                break;
-                        }
+                    if (chbStatuses.getSelectionModel().getSelectedItem() != null) {
+                        Integer choice = chbStatuses.getSelectionModel().getSelectedItem().getStatusId();
+                        String color;
+                        if (choice != null) {
+                            switch (choice) {
+                                case 1:
+                                    color = "-fx-control-inner-background: rgba(28,214,255,0.09);";
+                                    break;
+                                case 2:
+                                    color = "-fx-control-inner-background: rgba(22,165,255,0.14);";
+                                    break;
+                                case 3:
+                                    color = "-fx-control-inner-background: rgba(162,89,255,0.12);";
+                                    break;
+                                case 4:
+                                    color = "-fx-control-inner-background: rgba(208,255,38,0.11);";
+                                    break;
+                                case 5:
+                                    color = "-fx-control-inner-background: rgba(23,255,20,0.18);";
+                                    break;
+                                case 6:
+                                    color = "-fx-control-inner-background: rgba(31,117,31,0.31);";
+                                    break;
+                                case 7:
+                                    color = "-fx-control-inner-background: rgba(199,106,18,0.24);";
+                                    break;
+                                case 8:
+                                    color = "-fx-control-inner-background: rgba(254,82,60,0.71);";
+                                    break;
+                                case 9:
+                                    color = "-fx-control-inner-background: rgba(254,82,60,0);";
+                                    break;
+                                default:
+                                    color = "";
+                                    break;
+                            }
 
-                        chbStatuses.setStyle(color);
+                            chbStatuses.setStyle(color);
 //                            text.setFill(Color.web(color));
+                        }
                     }
                 }
         );
 
-        chbStatuses.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            }
-        });
 
-//                chbStatuses.setStyle("-fx-control-inner-background: rgba(31,117,31,0.31);");
-
-        departmentsList = departmentService.getAll();
         chbDepartments.setItems(departmentsList);
         chbSetDepartment.setItems(departmentsList);
+        chbDepartments.setValue(currentDepartment);
 
-        Integer departmentId = departmentService.getIdByClientDepartment("Всі");
 
-        if (departmentId != null)
-            if (departmentsList.get(departmentId - 1) != null) {
-                currentDepartment = departmentsList.get(departmentId - 1);
-                chbDepartments.setValue(currentDepartment);
-            }
 
     }
 
@@ -479,10 +508,12 @@ public class AdminController {
         fillChoiseBoxes();
 
         //дії чойз боксів при виборі елемента
+
         chbStatuses.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                chbStatusesOnAction();
+                filterStatus = chbStatuses.getValue();
+                adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
             }
         });
 
@@ -490,6 +521,7 @@ public class AdminController {
             @Override
             public void handle(ActionEvent event) {
                 newStatus = chbSetStatus.getValue();
+                btnSetStatusOnAction();
             }
         });
 
@@ -497,7 +529,8 @@ public class AdminController {
         chbDepartments.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                chbDepartmentsOnAction();
+                filterDepartment = chbDepartments.getValue();
+                adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
             }
         });
 
@@ -505,27 +538,11 @@ public class AdminController {
             @Override
             public void handle(ActionEvent event) {
                 newDepartment = chbSetDepartment.getValue();
-            }
-        });
-
-        System.out.println(chbStatuses.getStylesheets());
-
-        chbStatuses.setOnShowing(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-
-                System.out.println( chbStatuses.getContextMenu().getStyleClass() );
+                btnSetDepartmentOnAction();
             }
         });
 
 
-        txtAreaNewComment.addEventHandler(new EventType<>(), new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-
-
-            }
-        });
         txtAreaNewComment.setOnKeyTyped(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -547,37 +564,20 @@ public class AdminController {
         imViewLogo.setVisible(true);
     }
 
-    public void initialize(){
 
-        clientService = new ClientServiceImpl();
-        historyService = new HistoryServiceImpl();
-        statusService = new StatusServiceImpl();
-        departmentService = new DepartmentServiceImpl();
-        excelUtil = new ReadExcelUtil(clientService, historyService, departmentService);
-//        btn.setVisible(false);
-
-        if(clientService.testConnectionToDB()) {
-            clientTableSetup();
-            historyTableSetup();
-            choiseboxesSetup();
-            loadLogo();
-            System.out.println("setUp compleeted!");
-        }
-
-//        rootAnchorPane.setTopAnchor();
-
-    }
 
     private void chbDepartmentsOnAction(){
-        currentDepartment = chbDepartments.getValue();
-        clientsList = clientService.getClientsByStatusAndDepartment(currentStatus, currentDepartment);
-        tblViewClients.setItems(clientsList);
+
+        currentDepartment = chbDepartments.getValue() ;
+        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+
     }
 
     private void chbStatusesOnAction(){
-        currentStatus = chbStatuses.getValue();
-        clientsList = clientService.getClientsByStatusAndDepartment(currentStatus, currentDepartment);
-        tblViewClients.setItems(clientsList);
+
+        currentStatus = chbStatuses.getValue() ;
+        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+
     }
 
     public void btnSaveContactOnAction(){
@@ -587,8 +587,8 @@ public class AdminController {
         String parentName = fldParentName.getText();
         String phone = fldPhone.getText();
         String location = fldLocation.getText();
-        newStatus = chbSetStatus.getValue();
-        newDepartment = chbSetDepartment.getValue();
+        Status newStatus = chbSetStatus.getValue();
+        Department newDepartment = chbSetDepartment.getValue();
         Integer statusId = 1;
         Integer departmentId = 1;
         if(newStatus!= null){
@@ -614,9 +614,13 @@ public class AdminController {
             System.out.println("new client");
             System.out.println("statusid " + statusId + "   departmentId " + departmentId);
             newClient = new Client(name,birthday, parentName, phone, location,  departmentId, statusId);
-            clientService.save(newClient);
-            clientsList = clientService.getAll();
-            tblViewClients.setItems(clientsList);
+
+            adminModel.saveClient(newClient, userModel.getCurrentUser());
+            adminModel.getClientsByStatusAndDepartment(newStatus, newDepartment);
+//            clientService.save(newClient);
+//            clientsList = clientService.getAll();
+//            tblViewClients.setItems(clientsList);
+
             fldChildName.clear();
             fldLocation.clear();
             fldParentName.clear();
@@ -625,26 +629,25 @@ public class AdminController {
     }
 
     public void btnAddHistoryOnAction(){
-        newComment = txtAreaNewComment.getText();
+       String newComment = txtAreaNewComment.getText();
         if(!newComment.equals("") && currentClient!= null){
-            historyService.saveCommentByClient(currentClient, newComment);
+            adminModel.addComment(currentClient, newComment, userModel.getCurrentUser());
         }
-        tblViewClientsOnMouseClicked();
         txtAreaNewComment.clear();
     }
 
     public void tblViewClientsOnMouseClicked(){
-        selectedClients = tblViewClients.getSelectionModel().getSelectedItems();
+        selectedClients = tblViewClients.getSelectionModel().getSelectedItems() ;
         if(selectedClients!=null) {
 
             if(selectedClients.size()>1){
-                tblViewHistories.setItems(FXCollections.observableArrayList());
+                historiesList.clear();
             }else {
                 currentClient = selectedClients.get(0);
                 if (currentClient != null) {
-                    historiesList = historyService.getByClient(currentClient);
-                    tblViewHistories.setItems(historiesList);
+                    adminModel.getHistoriesByClient(currentClient);
                     currentHistory = historiesList.get(0);
+
                     if (currentHistory != null) {
                         currentTooltip.setText(currentHistory.getComment());
                     }
@@ -654,18 +657,40 @@ public class AdminController {
     }
 
     public void btnSetStatusOnAction(){
+        if(selectedClients == null || selectedClients.size() == 0) return;
+
         if(selectedClients != null && newStatus != null){
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             String names = clientsArrayToString();
             alert.setTitle("Змінити статус для " + names);
             alert.initOwner(mainStage);
-            alert.setHeaderText("Змінити статус \n"+ names + "\n на  " + newStatus);
+            alert.setHeaderText("Змінити статус \n"+ names + "з " +
+                    statusesList.get( selectedClients.get(0).getStatusId() - 1 ).getClientStatus() + "\n на  " + newStatus);
+            System.out.println(selectedClients.get(0).getStatusId() );
+
             alert.showAndWait();
             if(alert.getResult() == ButtonType.OK){
-                for (Client client: selectedClients) {
-                    clientService.setStatusToClient(client, newStatus);
-                }
-                chbStatusesOnAction();
+
+
+                adminModel.setStatus(
+                        selectedClients,
+                        newStatus,
+                        userModel.getCurrentUser()
+                );
+                adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                Platform.runLater(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+
+                        tblViewClients.requestFocus();
+                        tblViewClients.getSelectionModel().select(currentClient);
+                        tblViewClients.getFocusModel().focus(tblViewClients.getSelectionModel().getSelectedIndex());
+
+                    }
+                });
+                tblViewClients.getSelectionModel().select(currentClient);
             }else {
             }
         }
@@ -680,6 +705,7 @@ public class AdminController {
     }
 
     public void btnSetDepartmentOnAction(){
+        if(selectedClients == null || selectedClients.size() == 0) return;
         if(selectedClients != null && newDepartment != null){
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             String names = clientsArrayToString();
@@ -688,10 +714,14 @@ public class AdminController {
             alert.setHeaderText("Змінити філію для \n"+ names + "\n на  " + newDepartment);
             alert.showAndWait();
             if(alert.getResult() == ButtonType.OK){
-                for (Client client: selectedClients) {
-                    clientService.setDepartmentToClient(client, newDepartment);
-                }
-                chbDepartmentsOnAction();
+
+                adminModel.setDepartment(
+                        selectedClients,
+                        newDepartment,
+                        userModel.getCurrentUser()
+                );
+                adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                tblViewClients.getSelectionModel().select(currentClient);
             }else {
 
             }
@@ -700,40 +730,14 @@ public class AdminController {
 
     public void ButtonOnAction() {
 
-        System.out.println( chbStatuses.getStylesheets() );
-        chbStatuses.onShowingProperty().addListener(new ChangeListener<EventHandler<Event>>() {
-            @Override
-            public void changed(ObservableValue<? extends EventHandler<Event>> observable, EventHandler<Event> oldValue, EventHandler<Event> newValue) {
+//        System.out.println(currentClient);
+//        tblViewClients.getFocusModel().focus(2);
+//        tblViewClients.
 
-            }
-        });
-
-//        clientService.clearTable();
-//        excelUtil.readExcel();
-//        currentDepartment = departmentService.getById(9);
-//        currentStatus = statusService.getById(1);
-//        clientTableSetup();
-//        choiseboxesSetup();
-//        historyTableSetup();
-
-//
-//        System.out.println( excelUtil.extractAge("8,5") );
-//        System.out.println( excelUtil.extractAge("8.5") );
-//        System.out.println( excelUtil.extractAge("8") );
-
-
-//        tblViewClients.setItems(clientsList);
-//        departmentsList = departmentService.getAll();
-//        chbDepartments.setItems(departmentsList);
-//        departmentService.save(new Department("Всі"));
-
-//        System.out.println(ConnectionDBUtil.getCurrentIP());
-//        ConnectionDBUtil.getCurrentIp();
-//        clientService.testConnectionToDB();
     }
 
     public void tblViewHistoriesOnMouseClicked(){
-        currentHistory = tblViewHistories.getSelectionModel().getSelectedItem();
+        currentHistory = tblViewHistories.getSelectionModel().getSelectedItem() ;
         if (currentHistory!=null)
             currentTooltip.setText(currentHistory.getComment());
     }
@@ -752,22 +756,23 @@ public class AdminController {
 
 
 
-    private void importFromExcel(){
-        File file = new File("Контакти АБО Дитяча телешкола.xlsx");
-        if (!file.exists()){
-            FileChooser chooser = new FileChooser();
-            file = chooser.showOpenDialog(mainStage);
-        }
-        clientService.clearTable();
-        excelUtil.readExcel(file);
-        currentDepartment = departmentService.getById(9);
-        currentStatus = statusService.getById(1);
-        fillClientData();
-        fillChoiseBoxes();
-
+    public void importFromExcel(){
+        adminModel.reloadLists();
+        setCurrents();
+        setChoiseBoxesValues();
     }
 
+    public void changeConnection(){
+        adminModel.reloadLists();
+        setCurrents();
+        setChoiseBoxesValues();
+        userModel.exit();
+    }
 
+    private void setChoiseBoxesValues(){
+        chbStatuses.setValue(currentStatus);
+        chbDepartments.setValue(currentDepartment);
+    }
 
     public void newCommentOnKeyPressed(KeyEvent event){
         if(event.getCode() == KeyCode.ENTER ){

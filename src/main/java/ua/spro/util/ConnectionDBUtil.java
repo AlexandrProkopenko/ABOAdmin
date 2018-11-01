@@ -6,6 +6,9 @@ import ua.spro.entity.DBConnection;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Observable;
 
 public class ConnectionDBUtil extends Observable {
@@ -21,23 +24,54 @@ public class ConnectionDBUtil extends Observable {
     private static final String filePath = "sys/";
     private static File file;
     private DBConnection connection;
+    private static boolean connected;
+    private ObservableList<DBConnection> connections;
 
     private static ConnectionDBUtil uniqueInstance = new ConnectionDBUtil();
 
     private ConnectionDBUtil() {
         fileSetup();
-        connection = loadSavedConnectionsList().get(0);
-        if(connection != null){
-            url = connection.getFullURL();
-            login = connection.getUser();
-            password = connection.getPassword();
+        connections = loadSavedConnectionsList();
+        if(!connections.isEmpty()) {
+            connection = connections.get(0);
+            if (connection != null) {
+                url = connection.getFullURL();
+                login = connection.getUser();
+                password = connection.getPassword();
+            }
         }
+
+        if(connection == null){
+            connected = false;
+        }else {
+            connected = testConnectionToDB(url, login, password);
+        }
+    }
+
+    public ObservableList<DBConnection> getConnections() {
+        return connections;
     }
 
     public static ConnectionDBUtil getInstance(){
         return uniqueInstance;
     }
 
+    public boolean testConnectionToDB(String url, String login, String password){
+        try (Connection c = DriverManager.getConnection(url, login, password)){
+            System.out.println(url + login + password);
+            System.out.println("Connected to DB");
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Can`t connect to DB");
+//            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean isConnected() {
+        System.out.println("ConnectionDBUtil: connected - " + connected);
+        return connected;
+    }
 
     public  String getUrl() {
         return url;

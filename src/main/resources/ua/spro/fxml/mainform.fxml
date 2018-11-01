@@ -16,7 +16,7 @@
             <Menu mnemonicParsing="false" text="File">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#miSettingsOnAction" text="Settings" />
-                  <MenuItem mnemonicParsing="false" onAction="#miImportExcelOnAction" text="Import excel" />
+                  <MenuItem fx:id="miImportExcel" mnemonicParsing="false" onAction="#miImportExcelOnAction" text="Import excel" />
                   <MenuItem mnemonicParsing="false" onAction="#miCloseOnAction" text="Close" />
                </items>
             </Menu>

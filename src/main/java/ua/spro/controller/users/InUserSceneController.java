@@ -13,7 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import ua.spro.controller.MainController;
-import ua.spro.model.UserModelInterface;
+import ua.spro.model.user.UserModelInterface;
 
 public class InUserSceneController implements Observer {
 

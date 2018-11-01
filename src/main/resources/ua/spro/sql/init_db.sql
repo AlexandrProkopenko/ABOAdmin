@@ -8,12 +8,28 @@ create table departments
   cl_department varchar(30) null
 );
 
+create table users
+(
+  user_id int auto_increment
+    primary key,
+  login varchar(30) not null,
+  user_password varchar(30) not null
+);
+insert into users values(null, 'null', 'null');
+insert into users values(null, 'SPro', '1111');
+insert into users values(null, 'Orest', 'orest');
+insert into users values(null, 'Eva', 'eva');
+insert into users values(null, 'Love', 'love');
+insert into users values(null, 'Marina', 'marina');
+
 create table histories
 (
   history_id int auto_increment
     primary key,
   date_h     datetime     null,
-  note       varchar(255) null
+  note       varchar(255) null,
+  user_id    int not null,
+  foreign key (user_id) references users (user_id)
 );
 
 create table statuses
@@ -32,8 +48,9 @@ create table clients
   parent_name   varchar(30)     null,
   phone         varchar(25)     null,
   location      varchar(30)     null,
-  status_id     int default '1' not null,
   department_id int default '1' not null,
+  status_id     int default '1' not null,
+
   constraint clients_ibfk_1
   foreign key (status_id) references statuses (status_id),
   constraint clients_ibfk_2
@@ -66,17 +83,4 @@ insert into statuses values(null, 'Ходили раніше');
 insert into statuses values(null, 'Відмовились');
 insert into statuses values(null, 'Всі');
 
-use abo;
-drop table users;
-create table users
-(
-  user_id int auto_increment
-    primary key,
-  login varchar(30) not null,
-  user_password varchar(30) not null
-);
-insert into users values(null, 'Spro', '1111');
-insert into users values(null, 'Orest', 'orest');
-insert into users values(null, 'Eva', 'eva');
-insert into users values(null, 'Love', 'love');
-insert into users values(null, 'Marina', 'marina');
+

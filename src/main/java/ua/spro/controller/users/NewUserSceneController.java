@@ -15,9 +15,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import ua.spro.controller.MainController;
 import ua.spro.entity.SubUser;
-import ua.spro.entity.User;
-import ua.spro.model.UserModelInterface;
-import ua.spro.model.UserState;
+import ua.spro.model.user.UserModelInterface;
+import ua.spro.model.user.UserState;
 
 public class NewUserSceneController implements Observer {
 

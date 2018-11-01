@@ -9,15 +9,23 @@ import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import ua.spro.ABOAdminApp;
 import ua.spro.controller.main.AdminController;
 import ua.spro.controller.users.InUserSceneController;
 import ua.spro.controller.users.NewUserSceneController;
 import ua.spro.controller.users.NoUserSceneController;
-import ua.spro.model.UserModel;
-import ua.spro.model.UserState;
+import ua.spro.model.admin.AdminModel;
+import ua.spro.model.admin.AdminModelInterface;
+import ua.spro.model.user.UserModel;
+import ua.spro.model.user.UserModelInterface;
+import ua.spro.model.user.UserState;
+import ua.spro.util.ConnectionDBUtil;
+import ua.spro.util.ReadExcelUtil;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
@@ -48,7 +56,10 @@ public class MainController implements Observer {
     private InUserSceneController inUserController;
     private NoUserSceneController noUserController;
     private NewUserSceneController newUserController;
+
     private UserModel userModel;
+    private AdminModelInterface adminModel;
+    private ReadExcelUtil excelUtil;
     
 
     //  subscene for changing user authorization
@@ -57,7 +68,25 @@ public class MainController implements Observer {
     @FXML private AnchorPane mainAnchorPane;
     @FXML private ToggleButton btnAdminScene;
     @FXML private ToggleButton btnVisitScene;
+    @FXML private MenuItem miImportExcel;
 
+
+    public AdminController getAdminController() {
+        return adminController;
+    }
+
+    public void initialize(){
+        modelsSetup();
+        loadScenes();
+        panelSetup();
+        userModelSetup();
+        excelUtil = new ReadExcelUtil( userModel);
+    }
+
+    private void modelsSetup(){
+        adminModel = ABOAdminApp.getAdminModel();
+        userModel = ABOAdminApp.getUserModel();
+    }
 
     private void loadScenes(){
         adminLoader = new FXMLLoader();
@@ -69,6 +98,7 @@ public class MainController implements Observer {
             adminRoot = adminLoader.load();
             adminController = adminLoader.getController();
             adminController.setMainController(this);
+
 
             inUserLoader.setLocation(getClass().getResource(inUserFXMLPath));
             inUserRoot = inUserLoader.load();
@@ -94,7 +124,6 @@ public class MainController implements Observer {
     }
 
     private void userModelSetup(){
-        userModel = new UserModel();
         userModel.addObserver(this);
 
         inUserController.setUserModel(userModel);
@@ -108,14 +137,14 @@ public class MainController implements Observer {
 
 
         noUserController.lateInitialization();
+//        adminController.lateInitialization(userModel);
+
+        System.out.println("MainController setingUserModelToAdminController. User model: " + userModel);
+//        adminController.setUserModel(userModel);
+//        adminController.lateInitialization(userModel, adminModel);
     }
 
-    public void initialize(){
 
-        loadScenes();
-        panelSetup();
-        userModelSetup();
-    }
 
     private void panelSetup(){
         //        зміна розмірів сабсцени відповідно до розмірів батьківської панелі АнкорПейн
@@ -140,10 +169,25 @@ public class MainController implements Observer {
         alert.setHeaderText("Ця процедура видалить всі існуючі дані і заповнить базу даних новими!");
         alert.showAndWait();
         if(alert.getResult() == ButtonType.OK){
-//            importFromExcel();
+            importFromExcel(mainStage);
+            adminController.importFromExcel();
         }else {
 
         }
+    }
+
+
+    public boolean importFromExcel(Stage owner) {
+
+        File file = new File("Контакти АБО Дитяча телешкола.xlsx");
+        if (!file.exists()){
+            FileChooser chooser = new FileChooser();
+            file = chooser.showOpenDialog(owner);
+        }
+
+        excelUtil.readExcel(file);
+
+        return false;
     }
 
     public void miCloseOnAction(){
@@ -163,10 +207,17 @@ public class MainController implements Observer {
             if(userModel.getUserState() == UserState.NOT_ENTERED){
                 subSceneUser.setRoot(noUserRoot);
                 subScene.setDisable(true);
+                miImportExcel.setDisable(true);
+                if(!ConnectionDBUtil.getInstance().isConnected()) {
+                    subSceneUser.setDisable(true);
+                }else {
+                    subSceneUser.setDisable(false);
+                }
 
             }else if(userModel.getUserState() == UserState.ENTERED){
                 subSceneUser.setRoot(inUserRoot);
                 subScene.setDisable(false);
+                miImportExcel.setDisable(false);
             }else if(userModel.getUserState() == UserState.CREATING_NEW){
                 subSceneUser.setRoot(newUserRoot);
 //                newUserController
@@ -176,5 +227,8 @@ public class MainController implements Observer {
             }
 
         }
+//        if(adminController.getUserModel() == null){
+//            adminController.lateInitialization();
+//        }
     }
 }

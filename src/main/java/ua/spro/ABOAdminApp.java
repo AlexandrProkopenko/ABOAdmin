@@ -10,6 +10,11 @@ import javafx.stage.Stage;
 import ua.spro.controller.MainController;
 import ua.spro.controller.SettingsController;
 import ua.spro.controller.main.AdminController;
+import ua.spro.model.admin.AdminModel;
+import ua.spro.model.admin.AdminModelInterface;
+import ua.spro.model.user.UserModel;
+import ua.spro.model.user.UserModelInterface;
+
 
 public class ABOAdminApp extends Application {
 
@@ -22,14 +27,42 @@ public class ABOAdminApp extends Application {
     public static Stage adminStage;
     public static AdminController adminController;
 
+    private static UserModel userModel;
+    private static AdminModelInterface adminModel;
+
+
+    public static UserModel getUserModel() {
+        return userModel;
+    }
+
+    public static AdminModelInterface getAdminModel() {
+        return adminModel;
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage)   {
+
+        createUtils();
+        System.out.println("Utils Created");
+        try {
+            createMainForm(primaryStage);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void createUtils(){
+        userModel = new UserModel();
+        adminModel = new AdminModel();
+    }
+
+    private void createMainForm(Stage primaryStage) throws Exception{
         mainStage = primaryStage;
         mainStage.setTitle("ABO Admin");
-//        mainStage.setResizable(false);
 
         FXMLLoader mainLoader = new FXMLLoader();
         mainLoader.setLocation(getClass().getResource("/ua/spro/fxml/mainform.fxml"));
@@ -58,10 +91,13 @@ public class ABOAdminApp extends Application {
 
         settingsStage.setScene(new Scene(settingsRoot));
         settingsController = settingsLoader.getController();
+//        settingsController.setAdminController(mainController.getAdminController());
 //        settingsController.setMainStage(mainStage);
+//        settingsController.
 
 
         settingsStage.getIcons().add(ico);
+        System.out.println("app : controllers created");
 //        mainStage.getScene().getStylesheets().add("ua/spro/css/caspian.css");
         mainStage.show();
 

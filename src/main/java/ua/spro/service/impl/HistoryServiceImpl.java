@@ -41,11 +41,17 @@ public class HistoryServiceImpl implements HistoryService {
         return dao.getAll();
     }
 
+    @Override
     public ObservableList<History> getByClient(Client client){
         return dao.getByClient(client);
     }
 
     public boolean saveCommentByClient(Client client, String comment){
         return dao.saveCommentByClient(client, comment);
+    }
+
+    @Override
+    public boolean saveLink(Client client, History history) {
+        return dao.saveLink(client, history);
     }
 }

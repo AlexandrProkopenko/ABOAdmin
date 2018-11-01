@@ -7,6 +7,12 @@ import ua.spro.entity.Client;
 import ua.spro.entity.Department;
 import ua.spro.entity.History;
 import ua.spro.entity.Status;
+import ua.spro.model.user.UserModel;
+import ua.spro.model.user.UserModelInterface;
+import ua.spro.service.ClientService;
+import ua.spro.service.DepartmentService;
+import ua.spro.service.HistoryService;
+import ua.spro.service.StatusService;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.service.impl.DepartmentServiceImpl;
 import ua.spro.service.impl.HistoryServiceImpl;
@@ -20,26 +26,37 @@ import java.util.Formatter;
 
 public class ReadExcelUtil {
 
-    private ClientServiceImpl clientService;
-    private HistoryServiceImpl historyService;
-    private DepartmentServiceImpl departmentService;
-    private StatusServiceImpl statusService;
+    private ClientService clientService;
+    private HistoryService historyService;
+    private DepartmentService departmentService;
+    private StatusService statusService;
     private Client currentClient;
     private History currentHistory;
     private int currentDepartmentId;
     private Status currentStatus;
     private ObservableList<Status> statusList;
+    private UserModelInterface userModel;
 
-    public ReadExcelUtil(ClientServiceImpl clientService, HistoryServiceImpl historyService, DepartmentServiceImpl departmentService) {
-        this.clientService = clientService;
-        this.historyService = historyService;
-        this.departmentService = departmentService;
+    public void setUserModel(UserModel userModel) {
+        this.userModel = userModel;
+    }
+
+    public UserModelInterface getUserModel() {
+        return userModel;
+    }
+
+    public ReadExcelUtil(UserModelInterface userModel) {
+        this.clientService = new ClientServiceImpl();
+        this.historyService = new HistoryServiceImpl();
+        this.departmentService = new DepartmentServiceImpl();
+        this.userModel = userModel;
         statusService = new StatusServiceImpl();
         currentStatus = new Status("");
     }
 
     public boolean readExcel(File excelFile){
 //        File excelFile = new File("Контакти АБО Дитяча телешкола.xls");
+        clientService.clearTable();
         statusList = statusService.getAll();
         try(FileInputStream fileInputStream = new FileInputStream(excelFile)){
             Workbook wb = new XSSFWorkbook(fileInputStream);
@@ -151,7 +168,8 @@ public class ReadExcelUtil {
 
                     currentClient = new Client(childName, ageDouble,parentName, phone, location, currentDepartmentId, currentStatus.getStatusId() );
                     currentStatus.setStatusId(null);
-                    currentHistory = new History(LocalDateTime.now(),com);
+                   System.out.println(userModel);
+                    currentHistory = new History(LocalDateTime.now(),com, userModel.getCurrentUser().getUserId());
                     clientService.saveClientAndHistory(currentClient, currentHistory);
 
                }

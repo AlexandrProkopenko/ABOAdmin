@@ -9,11 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -22,8 +18,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.input.MouseEvent;
 import ua.spro.controller.MainController;
 import ua.spro.entity.User;
-import ua.spro.model.UserModelInterface;
-import ua.spro.model.UserState;
+import ua.spro.model.user.UserModelInterface;
+import ua.spro.model.user.UserState;
 
 public class NoUserSceneController implements Observer {
 

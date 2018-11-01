@@ -18,14 +18,12 @@ public class ClientServiceImpl implements ClientService {
         dao = new ClientDAOImpl();
     }
 
-    public boolean testConnectionToDB(){
-        return dao.testConnectionToDB();
-    }
-
+    @Override
     public boolean clearTable(){
         return dao.clearTable();
     }
 
+    @Override
     public boolean saveClientAndHistory(Client client, History history){
         return dao.saveClientAndHistory(client, history);
     }
@@ -59,6 +57,7 @@ public class ClientServiceImpl implements ClientService {
         return dao.getClientsByStatus(status);
     }
 
+    @Override
     public boolean setStatusToClient(Client client, Status newStatus){
         return dao.setStatusToClient(client, newStatus);
     }
@@ -66,12 +65,15 @@ public class ClientServiceImpl implements ClientService {
     public ObservableList<Client> getClientsByDepartment(Department department){
         return dao.getClientsByDepartment(department);
     }
-
+    @Override
     public boolean setDepartmentToClient(Client client, Department newDepartment){
         return dao.setDepartmentToClient(client, newDepartment);
     }
-
+    @Override
     public ObservableList<Client> getClientsByStatusAndDepartment(Status status, Department department){
         return dao.getClientsByStatusAndDepartment(status, department);
     }
+
+
+
 }
