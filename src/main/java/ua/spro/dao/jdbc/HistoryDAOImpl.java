@@ -31,20 +31,19 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
                 url, login, password)){
 
             PreparedStatement statement = c.prepareStatement(
-                    "INSERT INTO abo.histories(date_h , note)" +
-                            "VALUES (?, ?)" , Statement.RETURN_GENERATED_KEYS
+                    "INSERT INTO abo.histories(date_h , note, user_id)" +
+                            "VALUES (?, ?, ?)" , Statement.RETURN_GENERATED_KEYS
             );
             Timestamp currentDate = new Timestamp(System.currentTimeMillis());
             statement.setTimestamp(1,currentDate );
             statement.setString(2, history.getComment());
+            statement.setInt(3, history.getUserId());
             statement.execute();
 
             ResultSet generatedKeys = statement.getGeneratedKeys() ;
             if (generatedKeys.next()) {
                 history.setId((int) generatedKeys.getLong(1));
             }
-
-
             return history.getId();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,10 +62,11 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
                 url, login, password)){
 
             PreparedStatement statement = c.prepareStatement(
-                    "UPDATE abo.histories SET note = ? WHERE history_id = ?;"
+                    "UPDATE abo.histories SET note = ?, user_id = ? WHERE history_id = ?;"
             );
             statement.setString(1, history.getComment());
-            statement.setInt(2, history.getId());
+            statement.setInt(2, history.getUserId());
+            statement.setInt(3, history.getId());
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,18 +98,17 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
                 list.add(new History(
                         resultSet.getInt(1),
                         (resultSet.getTimestamp(2)).toLocalDateTime(),
-                        resultSet.getString(3)
+                        resultSet.getString(3),
+                        resultSet.getInt(4)
                 ));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("inDao");
-        for(History n: list){
-            System.out.println(n);
-            System.out.println("ddd");
-        }
+//        for(History n: list){
+//            System.out.println(n);
+//        }
         return list;
     }
 
@@ -118,7 +117,7 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
         Integer id = client.getId();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
-                    "select cl.client_id, h.date_h, h.note\n" +
+                    "select cl.client_id, h.date_h, h.note, h.user_id\n" +
                             "from clients cl\n" +
                             "join clients_history ch\n" +
                             "on cl.client_id = ch.client_id\n" +
@@ -136,23 +135,32 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
                 list.add(new History(
                         resultSet.getInt(1),
                         (resultSet.getTimestamp(2)).toLocalDateTime(),
-                        resultSet.getString(3)
+                        resultSet.getString(3),
+                        resultSet.getInt(4)
                 ));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("inDao");
         for(History n: list){
             System.out.println(n);
-            System.out.println("ddd");
         }
         return list;
     }
 
     public boolean saveCommentByClient(Client client, String comment){
 
+        /*
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        *
+        * */
         ObservableList<History> list = FXCollections.observableArrayList();
         try (Connection c = DriverManager.getConnection(
                 url, login, password)){
@@ -188,6 +196,27 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
 
             statement.setInt(1,client.getId() );
             statement.setInt(2, id);
+            statement.execute();
+
+            /* */
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean saveLink(Client client, History history){
+        try (Connection c = DriverManager.getConnection(
+                url, login, password)){
+                    PreparedStatement statement = c.prepareStatement(
+                    "INSERT INTO clients_history( client_id, history_id)" +
+                            "VALUES (?, ?)"
+            );
+
+            statement.setInt(1,client.getId() );
+            statement.setInt(2, history.getId());
             statement.execute();
 
             /* */

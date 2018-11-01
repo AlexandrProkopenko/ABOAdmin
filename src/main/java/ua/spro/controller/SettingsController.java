@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import ua.spro.ABOAdminApp;
+import ua.spro.controller.main.AdminController;
 import ua.spro.controller.settings.ConnectionSceneController;
 
 import java.io.IOException;
@@ -22,14 +23,20 @@ public class SettingsController {
     private TreeItem<String> connectionMenuItem;
     private TreeItem<String> newMenuItem;
     private TreeItem<String> rootMenuItem;
-    private static final String connectionFXMLPath = "/ua/spro/fxml/connectionscene.fxml";
-    private static final String fooFXMLPath = "/ua/spro/fxml/foo.fxml";
+    private static final String connectionFXMLPath = "/ua/spro/fxml/settings/connectionscene.fxml";
+    private static final String fooFXMLPath = "/ua/spro/fxml/settings/foo.fxml";
     private Parent connectionRoot;
     private Parent fooRoot;
     private FXMLLoader connectionLoader;
     private ConnectionSceneController connectionSceneController;
+
     private TreeItem<String> selectedItem;
 
+
+
+    public Button getBtnApply() {
+        return btnApply;
+    }
 
     private void treeViewSetup(){
         connectionMenuItem = new TreeItem<>();
@@ -44,8 +51,10 @@ public class SettingsController {
         rootMenuItem.getChildren().add(newMenuItem);
         subScene.setRoot(connectionRoot);
         selectedItem = connectionMenuItem;
+
         treeViewMenu.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedItem = newValue;
+
             switch (newValue.getValue()){
                 case "З'єднання":
 
@@ -66,7 +75,7 @@ public class SettingsController {
             connectionLoader.setLocation(getClass().getResource(connectionFXMLPath));
             connectionRoot = connectionLoader.load();
             connectionSceneController = connectionLoader.getController();
-            System.out.println(connectionSceneController);
+            connectionSceneController.setSettingsController(this);
 
 
             fooRoot = FXMLLoader.load(getClass().getResource(fooFXMLPath));
@@ -96,18 +105,34 @@ public class SettingsController {
                 break;
         }
 
-
+        btnApply.setDisable(true);
     }
 
     @FXML
     void btnCancelOnAction(ActionEvent event) {
+        switch (selectedItem .getValue()){
+            case "З'єднання":
+//                connectionSceneController.cancel();
+                btnApply.setDisable(true);
+                break;
+            case "foo":
+
+                break;
+            default:
+                break;
+        }
+
         ABOAdminApp.settingsStage.close();
     }
 
     @FXML
     void btnOkOnAction(ActionEvent event) {
-        btnApplyOnAction();
+        if(!btnApply.isDisable()) {
+            btnApplyOnAction();
+            System.out.println("applied");
+        }
         ABOAdminApp.settingsStage.close();
     }
+
 
 }

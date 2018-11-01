@@ -5,7 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import ua.spro.ABOAdminApp;
+import ua.spro.controller.SettingsController;
+import ua.spro.controller.main.AdminController;
 import ua.spro.entity.DBConnection;
+import ua.spro.service.ClientService;
 import ua.spro.service.impl.ClientServiceImpl;
 import ua.spro.util.ConnectionDBUtil;
 
@@ -26,7 +30,9 @@ public class ConnectionSceneController {
     @FXML private Label labelConnectionStatus;
     @FXML private Label labelSaveStatus;
     private ObservableList<DBConnection> connections;
+    private ObservableList<DBConnection> prevConnections;
     private DBConnection currentConnection;
+    private DBConnection prevCurrentConnection;
     private DBConnection newConnection;
 
     private static final String urlBegin = "jdbc:mysql://";
@@ -35,12 +41,27 @@ public class ConnectionSceneController {
     private String host = "";
     private String dataBase = "";
     private String port = "";
-    private String url;
-    private ClientServiceImpl clientService;
 
+    private String url;
+    private String login;
+    private String password;
+
+    private ClientService clientService;
+
+    private SettingsController settingsController;
+    private AdminController adminController;
+
+
+    public void setAdminController(AdminController adminController) {
+        this.adminController = adminController;
+    }
+
+    public void setSettingsController(SettingsController settingsController) {
+        this.settingsController = settingsController;
+    }
 
     public ConnectionSceneController() {
-        System.out.println("connection scene controller constructor");
+
     }
 
     private void chbConnectionsOnAction(){
@@ -61,23 +82,31 @@ public class ConnectionSceneController {
 
 
 
-
-
-    private void choiseBoxSetup(){
-        connections = ConnectionDBUtil.loadSavedConnectionsList();
+    private void fillData(){
+        connections.addAll( ConnectionDBUtil.getInstance().getConnections() );
+        prevConnections.addAll(connections);
         if(connections!=null) {
             chbConnections.setItems(connections);
             if(!connections.isEmpty()) {
                 currentConnection = connections.get(0);
+                prevCurrentConnection = currentConnection;
             }
             if(currentConnection != null) {
                 chbConnections.setValue(currentConnection);
                 chbConnectionsOnAction();
             }
         }
+    }
+
+    private void choiseBoxSetup(){
+        connections = FXCollections.observableArrayList();
+        prevConnections = FXCollections.observableArrayList();
+        fillData();
+
         //дії чойз боксів при виборі елемента
         chbConnections.setOnAction(event -> {
             currentConnection = chbConnections.getValue();
+            settingsController.getBtnApply().setDisable(false);
             chbConnectionsOnAction();
         });
     }
@@ -107,7 +136,7 @@ public class ConnectionSceneController {
 
     private void buildUrl(){
         String result = urlBegin + host + ":" + port + "/" + dataBase;
-        System.out.println("build url: " + result);
+//        System.out.println("build url: " + result);
         fldURL.setText(result);
     }
 
@@ -116,22 +145,21 @@ public class ConnectionSceneController {
         choiseBoxSetup();
         textFieldsSetup();
         clientService = new ClientServiceImpl();
-        System.out.println("initialize connection properties");
+        adminController = ABOAdminApp.adminController;
+//        System.out.println("initialize connection properties");
 
     }
+
 
     @FXML
     void btnDeleteOnAction(ActionEvent event) {
 
         if (currentConnection != null){
-            connections.remove(currentConnection);
-        }
-        if(ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection) ){
-            labelSaveStatus.setStyle("-fx-text-fill: green");
-            labelSaveStatus.setText("Видалено");
-        }else {
-            labelSaveStatus.setStyle("-fx-text-fill: red");
-            labelSaveStatus.setText("Не вдалося видалити");
+            boolean d = connections.remove(currentConnection);
+            System.out.println(" remove from collection "+d);
+            System.out.println(connections);
+            System.out.println(currentConnection);
+//            chbConnectionsOnAction();
         }
         currentConnection = connections.get(0);
         if (currentConnection != null){
@@ -139,7 +167,17 @@ public class ConnectionSceneController {
             chbConnectionsOnAction();
 
         }
+
+        if(ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection) ){
+            labelSaveStatus.setStyle("-fx-text-fill: green");
+            labelSaveStatus.setText("Видалено");
+        }else {
+            labelSaveStatus.setStyle("-fx-text-fill: red");
+            labelSaveStatus.setText("Не вдалося видалити");
+        }
+
         labelSaveStatus.setVisible(true);
+        settingsController.getBtnApply().setDisable(false);
     }
 
 
@@ -159,7 +197,7 @@ public class ConnectionSceneController {
         if(!connections.contains(newConnection)) {
             connections.add(newConnection);
             labelSaveStatus.setVisible(true);
-            if (ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection)) {
+            if (ConnectionDBUtil.saveConnectionsToFile(connections, newConnection)) {
                 System.out.println("save connection");
                 labelSaveStatus.setVisible(true);
                 labelSaveStatus.setStyle("-fx-text-fill: green");
@@ -173,6 +211,7 @@ public class ConnectionSceneController {
             currentConnection = newConnection;
             chbConnections.setValue(currentConnection);
             labelSaveStatus.setVisible(true);
+            settingsController.getBtnApply().setDisable(false);
         }
 
     }
@@ -180,12 +219,13 @@ public class ConnectionSceneController {
     @FXML
     void btnTestConnectionOnAction(ActionEvent event) {
         System.out.println(currentConnection);
-        ConnectionDBUtil.getInstance().setLogin(currentConnection.getUser());
-        ConnectionDBUtil.getInstance().setPassword(currentConnection.getPassword());
-        ConnectionDBUtil.getInstance().setUrl(currentConnection.getFullURL());
+        login = fldUser.getText();
+        password = fldPassword.getText();
+        url = fldURL.getText()+urlEnd;
+
         System.out.println("url changed to " + ConnectionDBUtil.getInstance().getUrl());
 
-        if(clientService.testConnectionToDB()){
+        if(ConnectionDBUtil.getInstance().testConnectionToDB(url, login, password)){
             labelConnectionStatus.setVisible(true);
             labelConnectionStatus.setStyle("-fx-text-fill: green");
             labelConnectionStatus.setText("З'єднання встановлено");
@@ -198,9 +238,26 @@ public class ConnectionSceneController {
 
     public void apply(){
 
-            ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
-
-
+        ConnectionDBUtil.getInstance().setLogin(currentConnection.getUser());
+        ConnectionDBUtil.getInstance().setPassword(currentConnection.getPassword());
+        ConnectionDBUtil.getInstance().setUrl(currentConnection.getFullURL());
+        ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
+        System.out.println("url changed to " + ConnectionDBUtil.getInstance().getUrl());
+        adminController.changeConnection();
     }
 
+    public void cancel(){
+//        currentConnection = prevCurrentConnection;
+//        connections.clear();
+//        connections.addAll(prevConnections);
+//        ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
+//        System.out.println(currentConnection);
+//        ConnectionDBUtil.getInstance().setLogin(currentConnection.getUser());
+//        ConnectionDBUtil.getInstance().setPassword(currentConnection.getPassword());
+//        ConnectionDBUtil.getInstance().setUrl(currentConnection.getFullURL());
+//        choiseBoxSetup();
+
+        System.out.println("url changed to " + ConnectionDBUtil.getInstance().getUrl());
+
+    }
 }

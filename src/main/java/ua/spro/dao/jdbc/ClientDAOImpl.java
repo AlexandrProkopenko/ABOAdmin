@@ -30,19 +30,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
 
     }
 
-    public boolean testConnectionToDB(){
-        try (Connection c = DriverManager.getConnection(url, login, password)){
-            System.out.println(url + login + password);
-            System.out.println("Connected to DB");
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Can`t connect to DB");
-//            e.printStackTrace();
-            return false;
-        }
-    }
-
-
 
     public boolean clearTable(){
         try (Connection c = DriverManager.getConnection(
@@ -207,11 +194,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        System.out.println("inDao");
-//        for(Client n: list){
-//            System.out.println(n);
-//            System.out.println("ddd");
-//        }
         return list;
     }
 
@@ -250,7 +232,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
         System.out.println("inDao");
         for(Client n: list){
             System.out.println(n);
-            System.out.println("ddd");
         }
         return list;
     }
@@ -311,7 +292,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
         System.out.println("inDao");
         for(Client n: list){
             System.out.println(n);
-            System.out.println("ddd");
         }
         return list;
     }
@@ -381,7 +361,6 @@ public class ClientDAOImpl implements ClientDAO, Observer {
         System.out.println("inDao");
         for(Client n: list){
             System.out.println(n);
-            System.out.println("ddd");
         }
         return list;
     }

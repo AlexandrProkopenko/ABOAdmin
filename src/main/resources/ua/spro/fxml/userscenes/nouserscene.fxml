@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="50.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.spro.controller.users.NoUserSceneController">
+   <children>
+      <Label fx:id="lbWrongPass" layoutX="56.0" layoutY="6.0" prefHeight="17.0" prefWidth="137.0" text="Неправильний пароль" textFill="#f24343" />
+      <Label layoutX="301.0" layoutY="-1.0" prefHeight="25.0" prefWidth="167.0" text="Вхід не виконано" textFill="#ff2525" AnchorPane.topAnchor="-1.0">
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="chbLogin" layoutY="24.0" prefHeight="25.0" prefWidth="167.0" AnchorPane.bottomAnchor="0.0" />
+      <Button defaultButton="true" layoutX="301.0" layoutY="15.0" mnemonicParsing="false" onAction="#btnEnterOnAction" prefHeight="25.0" prefWidth="115.0" text="Увійти" AnchorPane.bottomAnchor="0.0" />
+      <Button layoutX="444.0" layoutY="15.0" mnemonicParsing="false" onAction="#btnCreateUserOnAction" prefHeight="25.0" prefWidth="56.0" text="Новий" AnchorPane.bottomAnchor="0.0" />
+      <PasswordField fx:id="fldPassword" layoutX="180.0" layoutY="24.0" prefHeight="25.0" prefWidth="115.0" />
+   </children>
+</AnchorPane>

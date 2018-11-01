@@ -19,7 +19,19 @@ private IntegerProperty departmentId;
 private IntegerProperty statusId;
 
 
-    public Client(Integer id, String childName,  LocalDate birthday, String parentName, String phone, String location, Integer departmentId, Integer statusId) {
+    public Client(Client client) {
+        this.id = new SimpleIntegerProperty(this, "id", client.getId());
+        this.childName = new SimpleStringProperty(this, "childName", client.getChildName());
+        this.age = new SimpleDoubleProperty(this, "age", client.getAge());
+        this.birthday = new SimpleObjectProperty<>(this, "birthday", client.getBirthday());
+        this.parentName = new SimpleStringProperty(this, "parentName", client.getParentName());
+        this.phone =new SimpleStringProperty(this, "phone",  client.getPhone());
+        this.location = new SimpleStringProperty(this, "location",  client.getLocation());
+        this.departmentId = new SimpleIntegerProperty(this, "departmentId" , client.getDepartmentId());
+        this.statusId = new SimpleIntegerProperty(this, " statusId",  client.getStatusId());
+    }
+
+    public Client(Integer id, String childName, LocalDate birthday, String parentName, String phone, String location, Integer departmentId, Integer statusId) {
         this.id = new SimpleIntegerProperty(this, "id", id);
         this.childName = new SimpleStringProperty(this, "childName", childName);
         this.age = new SimpleDoubleProperty(this, "age", calculateAgeByBirthday(birthday));
@@ -182,6 +194,16 @@ private IntegerProperty statusId;
 
     public void setLocation(String location) {
         this.location.setValue(location);
+    }
+
+    public String getDescription(){
+
+        return "Ім'я дитини: "  + childName.get() + '\'' +
+                 + age.get() +" років " + '\'' +
+                "(" + birthday.get() + ")\n"+
+                " " + parentName.get() + '\'' +
+                  phone.get() + '\'' +
+                ", район: " + location.get();
     }
 
     @Override
