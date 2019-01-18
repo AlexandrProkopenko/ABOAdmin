@@ -1,4 +1,4 @@
-package ua.spro.entity;
+package ua.spro.entity.client;
 
 import javafx.beans.property.*;
 
@@ -17,7 +17,7 @@ public class History {
         this.dateTime = new SimpleObjectProperty<>(this, "dateTime", dateTime);
         this.comment = new SimpleStringProperty(this, "comment",  comment);
         this.userId = new SimpleIntegerProperty(this, "userId", userId);
-    }
+}
 
     public History(LocalDateTime dateTime, String comment, Integer userId) {
         this.dateTime = new SimpleObjectProperty<>(this, "dateTime", dateTime);

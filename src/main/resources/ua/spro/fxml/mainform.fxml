@@ -32,13 +32,13 @@
             </Menu>
          </menus>
       </MenuBar>
-      <ToggleButton fx:id="btnAdminScene" layoutX="999.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnAdminOnAction" text="Адміністрування" AnchorPane.rightAnchor="185.0">
+      <ToggleButton fx:id="btnAdminScene" layoutX="973.0" layoutY="13.0" mnemonicParsing="false" onAction="#btnAdminOnAction" text="Адміністрування" AnchorPane.rightAnchor="192.0">
          <toggleGroup>
             <ToggleGroup fx:id="q" />
          </toggleGroup>
       </ToggleButton>
-      <ToggleButton fx:id="btnVisitScene" layoutX="1088.0" layoutY="14.0" mnemonicParsing="false" text="Відмічання" toggleGroup="$q" AnchorPane.rightAnchor="95.0" />
-      <ToggleButton layoutX="1177.0" layoutY="14.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$q" AnchorPane.rightAnchor="7.0" />
+      <ToggleButton fx:id="btnVisitScene" layoutX="1088.0" layoutY="14.0" mnemonicParsing="false" text="Відмічання" toggleGroup="$q" AnchorPane.rightAnchor="108.0" />
+      <ToggleButton layoutX="1177.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnSttstcOnActon" text="Статистика" toggleGroup="$q" AnchorPane.rightAnchor="7.0" />
       <SubScene fx:id="subScene" height="750.0" layoutY="50.0" width="1273.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
         <root>
           <Region />

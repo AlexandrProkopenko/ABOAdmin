@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 import ua.spro.entity.SubUser;
 import ua.spro.entity.User;
 import ua.spro.service.UserService;
-import ua.spro.service.impl.UserServiceImpl;
+import ua.spro.service.jdbc.UserServiceImpl;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.io.*;
@@ -24,7 +24,7 @@ public class UserModel extends Observable implements UserModelInterface  {
 
     public UserModel() {
 //        addObserver(observer);
-        noUser = new User(1, "null", null);
+        noUser = new User(1, "null", "null");
         userState = UserState.NOT_ENTERED;
 
         userService = new UserServiceImpl();
@@ -38,13 +38,13 @@ public class UserModel extends Observable implements UserModelInterface  {
         fileSetup();
 
         currentUser = loadUserFromFile();
-        System.out.println(currentUser);
+        System.out.println(currentUser.getUserId() + " " + currentUser.getLogin() + " " + currentUser.getPassword());
             if (!currentUser.getLogin().equals("null")) {
 
                 changeState(UserState.ENTERED);
             }
         System.out.println(currentUser.getUserId() + " " + currentUser.getLogin() + " " + currentUser.getPassword());
-        System.out.println(users.get(0).getUserId() + " " + users.get(0).getLogin() + " " + users.get(0).getPassword());
+//        System.out.println(users.get(0).getUserId() + " " + users.get(0).getLogin() + " " + users.get(0).getPassword());
         if(currentUser != noUser) {
             setCurrentUserId();
         }
@@ -54,9 +54,10 @@ public class UserModel extends Observable implements UserModelInterface  {
     private boolean setCurrentUserId(){
         if(currentUser == null) return false;
         System.out.println(users);
-        System.out.println(currentUser);
+        System.out.println(currentUser.getUserId() + " " + currentUser.getLogin() + " " + currentUser.getPassword());
         for(User user: users){
-            System.out.println(user.getUserId()+ " " + user.getLogin() + " " + user.getPassword());
+            System.out.println("Current user: " + currentUser.getUserId() + " " + currentUser.getLogin() + " " + currentUser.getPassword());
+            System.out.println("user from collection: " +user.getUserId()+ " " + user.getLogin() + " " + user.getPassword());
 //            System.out.println(currentUser.getUserId()+ " " + user.getLogin() + " " + user.getPassword());
             if(currentUser.getLogin().equals(user.getLogin()) && currentUser.getPassword().equals(user.getPassword())){
                 currentUser.setUserId(user.getUserId());

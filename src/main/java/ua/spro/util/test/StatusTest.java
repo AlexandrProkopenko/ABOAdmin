@@ -1,8 +1,8 @@
-package ua.spro.util;
+package ua.spro.util.test;
 
 import javafx.collections.ObservableList;
-import ua.spro.entity.Status;
-import ua.spro.service.impl.StatusServiceImpl;
+import ua.spro.entity.client.Status;
+import ua.spro.service.jdbc.StatusServiceImpl;
 
 public class StatusTest {
     public static void main(String[] args) {

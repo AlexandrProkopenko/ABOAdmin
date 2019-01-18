@@ -1,8 +1,11 @@
 package ua.spro.model.admin;
 
 import javafx.collections.ObservableList;
-import javafx.stage.Stage;
-import ua.spro.entity.*;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
+import ua.spro.entity.User;
 
 public interface AdminModelInterface {
 

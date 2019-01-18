@@ -1,12 +1,9 @@
 package ua.spro.controller.main;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,27 +13,22 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import ua.spro.ABOAdminApp;
 import ua.spro.controller.MainController;
-import ua.spro.entity.*;
-import ua.spro.model.admin.AdminModel;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
+import ua.spro.entity.User;
 import ua.spro.model.admin.AdminModelInterface;
-import ua.spro.model.user.UserModel;
 import ua.spro.model.user.UserModelInterface;
-import ua.spro.service.impl.ClientServiceImpl;
-import ua.spro.service.impl.DepartmentServiceImpl;
-import ua.spro.service.impl.HistoryServiceImpl;
-import ua.spro.service.impl.StatusServiceImpl;
-import ua.spro.util.ReadExcelUtil;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Formatter;
-import java.util.List;
 
 public class AdminController {
 
@@ -191,16 +183,17 @@ public class AdminController {
         });
 
         clmnContactsChildName.setCellValueFactory(new PropertyValueFactory<Client, String>("childName"));
-        clmnContactsChildName.setCellFactory(column -> {
-            return new TableCell<Client, String>(){
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty ? "" : getItem().toString());
-                    setGraphic(null);
-                }
-            };
-        });
+        clmnContactsChildName.setCellFactory(TextFieldTableCell.forTableColumn());
+//        clmnContactsChildName.setCellFactory(column -> {
+//            return new TableCell<Client, String>(){
+//                @Override
+//                protected void updateItem(String item, boolean empty) {
+//                    super.updateItem(item, empty);
+//                    setText(empty ? "" : getItem().toString());
+//                    setGraphic(null);
+//                }
+//            };
+//        });
 
         clmnContactsChildName.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Client, String>>() {
             @Override
@@ -359,10 +352,10 @@ public class AdminController {
                                 currentRow.setStyle("-fx-control-inner-background: rgba(199,106,18,0.24);");
                                 break;
                             case 8:
-                                currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0.71);");
+                                currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
                                 break;
                             case 9:
-                                currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
+                                currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0.71);");
                                 break;
                             default:
                                 currentRow.setStyle("-fx-control-inner-background: rgba(254,82,60,0);");
@@ -380,8 +373,6 @@ public class AdminController {
         fillClientData();
         tblViewClients.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 //        selectedClients = FXCollections.observableArrayList();
-        tblViewClients.setEditable(true);
-        clmnContactsChildName.setEditable(true);
     }
 
     private void historyTableSetup(){
@@ -403,7 +394,28 @@ public class AdminController {
         });
 
         clmnHistoriesComment.setCellValueFactory(new PropertyValueFactory<History, String>("comment"));
-        clmnHistoriesComment.setCellFactory(TextFieldTableCell.forTableColumn());
+//        clmnHistoriesComment.setCellFactory(TextFieldTableCell.forTableColumn());
+        clmnHistoriesComment.setCellFactory(column -> {return new TableCell<History, String>() {
+            private Text text;
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if ( text != null ) {
+                    text.textProperty().unbind();
+                }
+                if ( empty || item == null ) {
+                    setGraphic(null);
+                } else {
+                    if ( text == null ) {
+                        text = new Text();
+                        text.wrappingWidthProperty().bind(getTableColumn().widthProperty());
+                    }
+                    text.textProperty().bind(itemProperty());
+                    setGraphic(text);
+                }
+            }
+        };});
+
         clmnHistoriesComment.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<History, String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<History, String> event) {

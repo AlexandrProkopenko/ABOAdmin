@@ -3,20 +3,20 @@ package ua.spro.util;
 import javafx.collections.ObservableList;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ua.spro.entity.Client;
-import ua.spro.entity.Department;
-import ua.spro.entity.History;
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
 import ua.spro.model.user.UserModel;
 import ua.spro.model.user.UserModelInterface;
 import ua.spro.service.ClientService;
 import ua.spro.service.DepartmentService;
 import ua.spro.service.HistoryService;
 import ua.spro.service.StatusService;
-import ua.spro.service.impl.ClientServiceImpl;
-import ua.spro.service.impl.DepartmentServiceImpl;
-import ua.spro.service.impl.HistoryServiceImpl;
-import ua.spro.service.impl.StatusServiceImpl;
+import ua.spro.service.jdbc.ClientServiceImpl;
+import ua.spro.service.jdbc.DepartmentServiceImpl;
+import ua.spro.service.jdbc.HistoryServiceImpl;
+import ua.spro.service.jdbc.StatusServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -159,6 +159,8 @@ public class ReadExcelUtil {
                if (!phone.equals("-")) {
 
                    String com = comment.toString();
+                   String begin = "Додано з excel: ";
+                   com = begin + com;
                    if(com.length()>=255) {
                        com = com.substring(0, 254);
                    }

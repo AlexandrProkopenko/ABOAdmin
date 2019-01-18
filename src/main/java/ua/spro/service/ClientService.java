@@ -1,10 +1,13 @@
 package ua.spro.service;
 
 import javafx.collections.ObservableList;
-import ua.spro.entity.Client;
-import ua.spro.entity.Department;
-import ua.spro.entity.History;
-import ua.spro.entity.Status;
+import ua.spro.entity.User;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
+
+import java.time.LocalDateTime;
 
 public interface ClientService {
 
@@ -23,6 +26,9 @@ public interface ClientService {
     boolean clearTable();
 
     ObservableList<Client> getClientsByStatusAndDepartment(Status status, Department department);
+
+    ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(
+            Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor);
 
     boolean setStatusToClient(Client client, Status newStatus);
 

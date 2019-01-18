@@ -1,6 +1,6 @@
 package ua.spro.model.action.actions;
 
-import ua.spro.entity.Department;
+import ua.spro.entity.client.Department;
 import ua.spro.model.action.UserAction;
 
 public class SetDepartmentAction implements UserAction {

@@ -2,18 +2,21 @@ package ua.spro.model.admin;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ua.spro.entity.*;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
+import ua.spro.entity.User;
 import ua.spro.model.action.UserAction;
 import ua.spro.model.action.actions.*;
-import ua.spro.model.user.UserModel;
 import ua.spro.service.ClientService;
 import ua.spro.service.DepartmentService;
 import ua.spro.service.HistoryService;
 import ua.spro.service.StatusService;
-import ua.spro.service.impl.ClientServiceImpl;
-import ua.spro.service.impl.DepartmentServiceImpl;
-import ua.spro.service.impl.HistoryServiceImpl;
-import ua.spro.service.impl.StatusServiceImpl;
+import ua.spro.service.jdbc.ClientServiceImpl;
+import ua.spro.service.jdbc.DepartmentServiceImpl;
+import ua.spro.service.jdbc.HistoryServiceImpl;
+import ua.spro.service.jdbc.StatusServiceImpl;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.time.LocalDate;

@@ -8,7 +8,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import ua.spro.entity.Client;
+import ua.spro.entity.client.Client;
 
 import java.time.LocalDate;
 import java.util.Formatter;

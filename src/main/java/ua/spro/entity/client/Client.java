@@ -1,22 +1,40 @@
-package ua.spro.entity;
+package ua.spro.entity.client;
 
 import javafx.beans.property.*;
 
+import javax.persistence.*;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "clients")
 public class Client {
 
-private IntegerProperty id;
-private StringProperty childName;
-private DoubleProperty age;
-private ObjectProperty<LocalDate> birthday;
-private StringProperty parentName;
-private StringProperty phone;
-private StringProperty location;
-private IntegerProperty departmentId;
-private IntegerProperty statusId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private IntegerProperty id;
+
+    @Column(name = "child_name")
+    private StringProperty childName;
+
+    @Transient
+    private DoubleProperty age;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "birthday")
+    private ObjectProperty<LocalDate> birthday;
+
+    @Column(name="parent_name")
+    private StringProperty parentName;
+
+    @Column(name = "phone")
+    private StringProperty phone;
+
+    @Column(name = "location")
+    private StringProperty location;
+
+    private IntegerProperty departmentId;
+    private IntegerProperty statusId;
 
 
     public Client(Client client) {

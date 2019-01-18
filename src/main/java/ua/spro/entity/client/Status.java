@@ -1,4 +1,4 @@
-package ua.spro.entity;
+package ua.spro.entity.client;
 
 public class Status {
 

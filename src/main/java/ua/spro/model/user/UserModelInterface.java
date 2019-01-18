@@ -4,8 +4,6 @@ import javafx.collections.ObservableList;
 import ua.spro.entity.SubUser;
 import ua.spro.entity.User;
 
-import java.util.Observable;
-
 public interface UserModelInterface  {
 
     ObservableList<User> getAllUsers();

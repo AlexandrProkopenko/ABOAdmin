@@ -1,6 +1,6 @@
 package ua.spro.model.action.actions;
 
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Status;
 import ua.spro.model.action.UserAction;
 
 public class SetStatusAction implements UserAction {

@@ -1,12 +1,9 @@
-package ua.spro.service.impl;
+package ua.spro.service.jdbc;
 
 import javafx.collections.ObservableList;
-import ua.spro.dao.StatusDAO;
 import ua.spro.dao.jdbc.StatusDAOImpl;
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Status;
 import ua.spro.service.StatusService;
-
-import java.util.Observable;
 
 public class StatusServiceImpl implements StatusService {
 

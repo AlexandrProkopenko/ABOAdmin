@@ -1,8 +1,8 @@
 package ua.spro.service;
 
 import javafx.collections.ObservableList;
-import ua.spro.entity.Client;
-import ua.spro.entity.History;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.History;
 
 public interface HistoryService {
 

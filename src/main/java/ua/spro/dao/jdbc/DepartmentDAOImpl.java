@@ -3,7 +3,7 @@ package ua.spro.dao.jdbc;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ua.spro.dao.DepartmentDAO;
-import ua.spro.entity.Department;
+import ua.spro.entity.client.Department;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
@@ -39,8 +39,9 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
                 department.setDepartmentId((int) generatedKeys.getLong(1));
             }
 
-
+            c.close();
             return department.getDepartmentId();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,7 +69,7 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * " +
-                            "FROM abo.departments  "
+                            "FROM departments  "
 
             );
 
@@ -80,7 +81,7 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
                         resultSet.getString(2)
                 ));
             }
-
+        c.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -93,7 +94,7 @@ public class DepartmentDAOImpl implements DepartmentDAO, Observer {
 //        System.out.println("in method");
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
-                    "SELECT * FROM abo.departments WHERE cl_department = ?  "
+                    "SELECT * FROM departments WHERE cl_department = ?  "
 
             );
             statement.setString(1,  clientDepartment );

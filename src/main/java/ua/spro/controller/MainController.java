@@ -13,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ua.spro.ABOAdminApp;
 import ua.spro.controller.main.AdminController;
+import ua.spro.controller.main.StatisticController;
 import ua.spro.controller.users.InUserSceneController;
 import ua.spro.controller.users.NewUserSceneController;
 import ua.spro.controller.users.NoUserSceneController;
@@ -38,10 +39,15 @@ public class MainController implements Observer {
 
     //    subScene for changing main action zone
     @FXML private SubScene subScene;
-
+//  admin controller
     private FXMLLoader adminLoader;
     private static final String adminFXMLPath = "/ua/spro/fxml/mainsubscenes/adminscene.fxml";
     private Parent adminRoot;
+// statistic controller
+    private FXMLLoader statisticLoader;
+    private static final String statisticFXMLPath = "/ua/spro/fxml/mainsubscenes/statisticscene.fxml";
+    private Parent statisticRoot;
+    private StatisticController statisticController;
     
 //    User`s subscene parameters
     private FXMLLoader inUserLoader;
@@ -81,6 +87,8 @@ public class MainController implements Observer {
         panelSetup();
         userModelSetup();
         excelUtil = new ReadExcelUtil( userModel);
+//Версія для колег
+//        miImportExcel.setDisable(true);
     }
 
     private void modelsSetup(){
@@ -90,6 +98,7 @@ public class MainController implements Observer {
 
     private void loadScenes(){
         adminLoader = new FXMLLoader();
+        statisticLoader = new FXMLLoader();
         inUserLoader = new FXMLLoader();
         noUserLoader = new FXMLLoader();
         newUserLoader = new FXMLLoader();
@@ -99,6 +108,10 @@ public class MainController implements Observer {
             adminController = adminLoader.getController();
             adminController.setMainController(this);
 
+            statisticLoader.setLocation(getClass().getResource(statisticFXMLPath));
+            statisticRoot = statisticLoader.load();
+            statisticController = statisticLoader.getController();
+            statisticController.setMainController(this);
 
             inUserLoader.setLocation(getClass().getResource(inUserFXMLPath));
             inUserRoot = inUserLoader.load();
@@ -171,6 +184,7 @@ public class MainController implements Observer {
         if(alert.getResult() == ButtonType.OK){
             importFromExcel(mainStage);
             adminController.importFromExcel();
+            statisticController.importFromExcel();
         }else {
 
         }
@@ -199,6 +213,12 @@ public class MainController implements Observer {
         subScene.setRoot(adminRoot);
     }
 
+    public void btnSttstcOnActon(){
+        statisticController.refresh();
+        subScene.setRoot(statisticRoot);
+
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         System.out.println("Main controller update");
@@ -217,7 +237,7 @@ public class MainController implements Observer {
             }else if(userModel.getUserState() == UserState.ENTERED){
                 subSceneUser.setRoot(inUserRoot);
                 subScene.setDisable(false);
-                miImportExcel.setDisable(false);
+//                miImportExcel.setDisable(false);
             }else if(userModel.getUserState() == UserState.CREATING_NEW){
                 subSceneUser.setRoot(newUserRoot);
 //                newUserController

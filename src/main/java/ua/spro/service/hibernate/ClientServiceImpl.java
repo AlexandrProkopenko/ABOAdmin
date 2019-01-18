@@ -1,14 +1,12 @@
-package ua.spro.service.impl;
+package ua.spro.service.hibernate;
 
 import javafx.collections.ObservableList;
-import ua.spro.dao.jdbc.ClientDAOImpl;
-import ua.spro.entity.Client;
-import ua.spro.entity.Department;
-import ua.spro.entity.History;
-import ua.spro.entity.Status;
+import ua.spro.dao.hibernate.ClientDAOImpl;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.History;
+import ua.spro.entity.client.Status;
 import ua.spro.service.ClientService;
-
-import java.util.Observable;
 
 public class ClientServiceImpl implements ClientService {
 

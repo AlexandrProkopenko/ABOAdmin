@@ -1,4 +1,4 @@
-package ua.spro.service.impl;
+package ua.spro.service.jdbc;
 
 import javafx.collections.ObservableList;
 import ua.spro.dao.UserDAO;

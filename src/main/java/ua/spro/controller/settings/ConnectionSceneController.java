@@ -8,12 +8,11 @@ import javafx.scene.control.*;
 import ua.spro.ABOAdminApp;
 import ua.spro.controller.SettingsController;
 import ua.spro.controller.main.AdminController;
+import ua.spro.controller.main.StatisticController;
 import ua.spro.entity.DBConnection;
 import ua.spro.service.ClientService;
-import ua.spro.service.impl.ClientServiceImpl;
+import ua.spro.service.jdbc.ClientServiceImpl;
 import ua.spro.util.ConnectionDBUtil;
-
-import java.io.*;
 
 public class ConnectionSceneController {
 
@@ -50,6 +49,7 @@ public class ConnectionSceneController {
 
     private SettingsController settingsController;
     private AdminController adminController;
+    private StatisticController statisticController;
 
 
     public void setAdminController(AdminController adminController) {
@@ -146,6 +146,7 @@ public class ConnectionSceneController {
         textFieldsSetup();
         clientService = new ClientServiceImpl();
         adminController = ABOAdminApp.adminController;
+        statisticController = ABOAdminApp.statisticController;
 //        System.out.println("initialize connection properties");
 
     }
@@ -244,6 +245,7 @@ public class ConnectionSceneController {
         ConnectionDBUtil.saveConnectionsToFile(connections, currentConnection);
         System.out.println("url changed to " + ConnectionDBUtil.getInstance().getUrl());
         adminController.changeConnection();
+        statisticController.changeConnection();
     }
 
     public void cancel(){

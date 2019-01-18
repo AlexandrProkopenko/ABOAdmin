@@ -1,17 +1,21 @@
-package ua.spro.dao.jdbc;
+package ua.spro.dao.hibernate;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import ua.spro.dao.ClientDAO;
-import ua.spro.entity.User;
+import ua.spro.dao.jdbc.HistoryDAOImpl;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.util.ConnectionDBUtil;
+import ua.spro.util.HibernateUtil;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -22,11 +26,14 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
     private HistoryDAOImpl historyDAO;
+    private SessionFactory factory;
 
 
     public ClientDAOImpl(){
 
-        ConnectionDBUtil.getInstance().addObserver(this);
+        factory = HibernateUtil.getFactory();
+
+//        ConnectionDBUtil.getInstance().addObserver(this);
         historyDAO = new HistoryDAOImpl();
 
 
@@ -42,7 +49,7 @@ public class ClientDAOImpl implements ClientDAO, Observer {
             );
             statement.execute();
             statement = c.prepareStatement(
-                     "DELETE from clients;"
+                    "DELETE from clients;"
             );
             statement.execute();
             statement = c.prepareStatement(
@@ -51,7 +58,7 @@ public class ClientDAOImpl implements ClientDAO, Observer {
             statement.execute();
 
             statement = c.prepareStatement(
-                      "DELETE  from histories"
+                    "DELETE  from histories"
             );
             statement.execute();
             statement = c.prepareStatement(
@@ -102,32 +109,19 @@ public class ClientDAOImpl implements ClientDAO, Observer {
 
     @Override
     public Integer save(Client client) {
-        try (Connection c = DriverManager.getConnection(
-                url, login, password)){
-            System.out.println("departmentId " + client.getDepartmentId());
-            PreparedStatement statement = c.prepareStatement(
-                    "INSERT INTO clients(child_name, birthday, parent_name, phone, location, department_id, status_id)" +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?)" , Statement.RETURN_GENERATED_KEYS
-            );
-            statement.setString(1, client.getChildName());
-            statement.setDate(2, java.sql.Date.valueOf(client.getBirthday()));
-            statement.setString(3, client.getParentName());
-            statement.setString(4, client.getPhone());
-            statement.setString(5, client.getLocation());
-            statement.setInt(6, client.getDepartmentId());
-            statement.setInt(7, client.getStatusId());
+        Session session = factory.openSession();
+        try {
 
-            statement.execute();
+            session.beginTransaction();
+            session.save(client);
 
-            ResultSet generatedKeys = statement.getGeneratedKeys() ;
-                if (generatedKeys.next()) {
-                    client.setId((int) generatedKeys.getLong(1));
-                }
-            System.out.println(" ClientId    " +client.getId());
-            c.close();
-            return client.getId();
-        } catch (SQLException e) {
+            session.getTransaction().commit();
+            return (Integer) session.getIdentifier(client);
+        }catch (HibernateException e){
             e.printStackTrace();
+            session.getTransaction().rollback();
+        }finally {
+            session.close();
         }
         return null;
     }
@@ -369,18 +363,11 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     }
 
     @Override
-    public ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(
-            Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor) {
-
-        return null;
-    }
-
-    @Override
     public void update(Observable o, Object arg) {
         if(o instanceof ConnectionDBUtil){
-             url = ConnectionDBUtil.getInstance().getUrl();
-             login = ConnectionDBUtil.getInstance().getLogin();
-             password = ConnectionDBUtil.getInstance().getPassword();
+            url = ConnectionDBUtil.getInstance().getUrl();
+            login = ConnectionDBUtil.getInstance().getLogin();
+            password = ConnectionDBUtil.getInstance().getPassword();
         }
     }
 }

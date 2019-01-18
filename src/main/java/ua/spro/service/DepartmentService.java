@@ -1,7 +1,7 @@
 package ua.spro.service;
 
 import javafx.collections.ObservableList;
-import ua.spro.entity.Department;
+import ua.spro.entity.client.Department;
 
 public interface DepartmentService {
 

@@ -1,10 +1,9 @@
 package ua.spro.dao.jdbc;
 
-import com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ua.spro.dao.StatusDAO;
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Status;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
@@ -48,7 +47,7 @@ public class StatusDAOImpl implements StatusDAO, Observer {
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * " +
-                            "FROM abo.statuses  "
+                            "FROM statuses  "
 
             );
             ResultSet resultSet = statement.executeQuery();
@@ -58,7 +57,7 @@ public class StatusDAOImpl implements StatusDAO, Observer {
                         resultSet.getString(2)
                 ));
             }
-
+        c.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

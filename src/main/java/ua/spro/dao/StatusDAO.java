@@ -1,7 +1,7 @@
 package ua.spro.dao;
 
 import javafx.collections.ObservableList;
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Status;
 
 public interface StatusDAO {
 

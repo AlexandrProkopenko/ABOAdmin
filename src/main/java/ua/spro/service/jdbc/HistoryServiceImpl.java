@@ -1,12 +1,10 @@
-package ua.spro.service.impl;
+package ua.spro.service.jdbc;
 
 import javafx.collections.ObservableList;
 import ua.spro.dao.jdbc.HistoryDAOImpl;
-import ua.spro.entity.Client;
-import ua.spro.entity.History;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.History;
 import ua.spro.service.HistoryService;
-
-import java.util.Observable;
 
 public class HistoryServiceImpl implements HistoryService {
 

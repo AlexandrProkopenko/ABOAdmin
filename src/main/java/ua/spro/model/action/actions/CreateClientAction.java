@@ -2,9 +2,9 @@ package ua.spro.model.action.actions;
 
 
 import ua.spro.ABOAdminApp;
-import ua.spro.entity.Client;
-import ua.spro.entity.Department;
-import ua.spro.entity.Status;
+import ua.spro.entity.client.Client;
+import ua.spro.entity.client.Department;
+import ua.spro.entity.client.Status;
 import ua.spro.model.action.UserAction;
 import ua.spro.model.admin.AdminModelInterface;
 

@@ -10,8 +10,11 @@ import javafx.stage.Stage;
 import ua.spro.controller.MainController;
 import ua.spro.controller.SettingsController;
 import ua.spro.controller.main.AdminController;
+import ua.spro.controller.main.StatisticController;
 import ua.spro.model.admin.AdminModel;
 import ua.spro.model.admin.AdminModelInterface;
+import ua.spro.model.statistic.StatisticModel;
+import ua.spro.model.statistic.StatisticModelInterface;
 import ua.spro.model.user.UserModel;
 import ua.spro.model.user.UserModelInterface;
 
@@ -27,8 +30,11 @@ public class ABOAdminApp extends Application {
     public static Stage adminStage;
     public static AdminController adminController;
 
+    public static StatisticController statisticController;
+
     private static UserModel userModel;
     private static AdminModelInterface adminModel;
+    private static StatisticModelInterface statisticModel;
 
 
     public static UserModel getUserModel() {
@@ -37,6 +43,10 @@ public class ABOAdminApp extends Application {
 
     public static AdminModelInterface getAdminModel() {
         return adminModel;
+    }
+
+    public static StatisticModelInterface getStatisticModel() {
+        return statisticModel;
     }
 
     public static void main(String[] args) {
@@ -58,6 +68,7 @@ public class ABOAdminApp extends Application {
     private void createUtils(){
         userModel = new UserModel();
         adminModel = new AdminModel();
+        statisticModel = new StatisticModel();
     }
 
     private void createMainForm(Stage primaryStage) throws Exception{

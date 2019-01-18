@@ -111,7 +111,7 @@ public class UserDAOImpl implements UserDAO, Observer {
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * " +
-                            "FROM abo.users"
+                            "FROM users"
 
             );
 
@@ -123,7 +123,7 @@ public class UserDAOImpl implements UserDAO, Observer {
                         resultSet.getString(3)
                 ));
             }
-
+        c.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

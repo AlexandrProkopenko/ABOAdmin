@@ -1,11 +1,9 @@
-package ua.spro.service.impl;
+package ua.spro.service.jdbc;
 
 import javafx.collections.ObservableList;
 import ua.spro.dao.jdbc.DepartmentDAOImpl;
-import ua.spro.entity.Department;
+import ua.spro.entity.client.Department;
 import ua.spro.service.DepartmentService;
-
-import java.util.Observable;
 
 public class DepartmentServiceImpl implements DepartmentService {
 

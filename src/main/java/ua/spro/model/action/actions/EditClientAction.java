@@ -1,6 +1,6 @@
 package ua.spro.model.action.actions;
 
-import ua.spro.entity.Client;
+import ua.spro.entity.client.Client;
 import ua.spro.model.action.UserAction;
 
 public class EditClientAction implements UserAction {

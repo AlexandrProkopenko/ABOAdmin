@@ -2,48 +2,43 @@ package ua.spro.dao.jdbc;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import ua.spro.dao.HistoryDAO;
+import ua.spro.dao.TaskDAO;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.History;
+import ua.spro.entity.task.Task;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class HistoryDAOImpl implements HistoryDAO, Observer {
+public class TaskDAOImpl implements TaskDAO, Observer {
 
     private static String url = ConnectionDBUtil.getInstance().getUrl();
     private static String login = ConnectionDBUtil.getInstance().getLogin();
     private static String password = ConnectionDBUtil.getInstance().getPassword();
 
-
-    public HistoryDAOImpl() {
-
-        ConnectionDBUtil.getInstance().addObserver(this);
-    }
-
     @Override
-    public Integer save(History history) {
+    public Integer save(Task task) {
         try (Connection c = DriverManager.getConnection(
                 url, login, password)){
 
             PreparedStatement statement = c.prepareStatement(
-                    "INSERT INTO histories(date_h , note, user_id)" +
+                    "INSERT INTO tasks(end_date , executor_id, done)" +
                             "VALUES (?, ?, ?)" , Statement.RETURN_GENERATED_KEYS
             );
-            Timestamp currentDate = new Timestamp(System.currentTimeMillis());
-            statement.setTimestamp(1, currentDate );
-            statement.setString(2, history.getComment());
-            statement.setInt(3, history.getUserId());
+            Timestamp endDate = Timestamp.valueOf(task.getEndDate());
+            statement.setTimestamp(1, endDate );
+            statement.setInt(2, task.getExecutorId());
+            statement.setBoolean(3, task.isDone());
             statement.execute();
 
             ResultSet generatedKeys = statement.getGeneratedKeys() ;
             if (generatedKeys.next()) {
-                history.setId((int) generatedKeys.getLong(1));
+                task.setId((int) generatedKeys.getLong(1));
             }
             c.close();
-            return history.getId();
+            return task.getId();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -51,21 +46,23 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
     }
 
     @Override
-    public History getById(Integer id) {
+    public Task getById(Integer id) {
         return null;
     }
 
     @Override
-    public boolean update(History history) {
+    public boolean update(Task task) {
         try (Connection c = DriverManager.getConnection(
                 url, login, password)){
 
             PreparedStatement statement = c.prepareStatement(
-                    "UPDATE histories SET note = ?, user_id = ? WHERE history_id = ?;"
+                    "UPDATE tasks SET end_date = ?, executor_id = ?, done = ? WHERE task_id = ?;"
             );
-            statement.setString(1, history.getComment());
-            statement.setInt(2, history.getUserId());
-            statement.setInt(3, history.getId());
+            Timestamp endDate = Timestamp.valueOf(task.getEndDate());
+            statement.setTimestamp(1, endDate );
+            statement.setInt(2, task.getExecutorId());
+            statement.setBoolean(3, task.isDone());
+            statement.setInt(4, task.getId());
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -76,13 +73,32 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
     }
 
     @Override
-    public boolean delete(History history) {
+    public boolean updateDone(Task task) {
+        try (Connection c = DriverManager.getConnection(
+                url, login, password)){
+
+            PreparedStatement statement = c.prepareStatement(
+                    "UPDATE tasks SET done = ? WHERE task_id = ?;"
+            );
+            statement.setBoolean(1, task.isDone() ? false : true );
+            statement.setInt(2, task.getId());
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        System.out.println("update success");
+        return true;
+    }
+
+    @Override
+    public boolean delete(Task task) {
         return false;
     }
 
     @Override
-    public ObservableList<History> getAll() {
-        ObservableList<History> list = FXCollections.observableArrayList();
+    public ObservableList<Task> getAll() {
+        ObservableList<Task> list = FXCollections.observableArrayList();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * " +
@@ -94,24 +110,47 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
 
-                list.add(new History(
+                list.add(new Task(
                         resultSet.getInt(1),
                         (resultSet.getTimestamp(2)).toLocalDateTime(),
-                        resultSet.getString(3),
-                        resultSet.getInt(4)
+                        resultSet.getInt(3),
+                        resultSet.getBoolean(4)
                 ));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        for(History n: list){
-//            System.out.println(n);
-//        }
+
+
         return list;
     }
 
-    public ObservableList<History> getByClient(Client client){
+    @Override
+    public boolean saveLink(History history, Task task) {
+        try (Connection c = DriverManager.getConnection(
+                url, login, password)){
+            PreparedStatement statement = c.prepareStatement(
+                    "INSERT INTO histories_tasks( history_id, task_id) " +
+                            "VALUES (?, ?)"
+            );
+
+            statement.setInt(1,history.getId() );
+            statement.setInt(2, task.getId());
+            statement.execute();
+
+            /* */
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public ObservableList<Task> getByClient(Client client) {
+        /*
         ObservableList<History> list = FXCollections.observableArrayList();
         Integer id = client.getId();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
@@ -146,88 +185,9 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
             System.out.println(n);
         }
         return list;
+        */
+        return null;
     }
-
-    public boolean saveCommentByClient(Client client, String comment){
-
-        /*
-        *
-        *
-        *
-        *
-        *
-        *
-        *
-        *
-        * */
-
-        try (Connection c = DriverManager.getConnection(
-                url, login, password)){
-
-            PreparedStatement statement = c.prepareStatement(
-                    "INSERT INTO histories( date_h, note)" +
-                            "VALUES (?, ?)"
-            );
-
-            Timestamp currentDate = new Timestamp(System.currentTimeMillis());
-            statement.setTimestamp(1,currentDate );
-            statement.setString(2, comment);
-            statement.execute();
-            statement.clearParameters();
-
-            statement = c.prepareStatement(
-                    "SELECT max(history_id) " +
-                            "FROM histories  "
-                            );
-            ResultSet resultSet = statement.executeQuery();
-            Integer id = null;
-//
-            while (resultSet.next()) {
-                       id = resultSet.getInt(1);
-            }
-            statement.clearParameters();
-
-
-            statement = c.prepareStatement(
-                    "INSERT INTO clients_history( client_id, history_id)" +
-                            "VALUES (?, ?)"
-            );
-
-            statement.setInt(1, client.getId() );
-            statement.setInt(2, id);
-            statement.execute();
-
-            /* */
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public boolean saveLink(Client client, History history){
-        try (Connection c = DriverManager.getConnection(
-                url, login, password)){
-                    PreparedStatement statement = c.prepareStatement(
-                    "INSERT INTO clients_history( client_id, history_id)" +
-                            "VALUES (?, ?)"
-            );
-
-            statement.setInt(1,client.getId() );
-            statement.setInt(2, history.getId());
-            statement.execute();
-
-            /* */
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-
 
     @Override
     public void update(Observable o, Object arg) {
@@ -238,6 +198,3 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
         }
     }
 }
-
-
-
