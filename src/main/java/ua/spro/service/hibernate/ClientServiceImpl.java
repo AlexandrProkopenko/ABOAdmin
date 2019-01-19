@@ -2,11 +2,14 @@ package ua.spro.service.hibernate;
 
 import javafx.collections.ObservableList;
 import ua.spro.dao.hibernate.ClientDAOImpl;
+import ua.spro.entity.User;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.service.ClientService;
+
+import java.time.LocalDateTime;
 
 public class ClientServiceImpl implements ClientService {
 
@@ -72,6 +75,8 @@ public class ClientServiceImpl implements ClientService {
         return dao.getClientsByStatusAndDepartment(status, department);
     }
 
-
-
+    @Override
+    public ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor) {
+        return null;
+    }
 }

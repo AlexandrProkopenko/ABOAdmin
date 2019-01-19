@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import ua.spro.dao.ClientDAO;
 import ua.spro.dao.jdbc.HistoryDAOImpl;
+import ua.spro.entity.User;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
@@ -16,6 +17,7 @@ import ua.spro.util.ConnectionDBUtil;
 import ua.spro.util.HibernateUtil;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -360,6 +362,11 @@ public class ClientDAOImpl implements ClientDAO, Observer {
             System.out.println(n);
         }
         return list;
+    }
+
+    @Override
+    public ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor) {
+        return null;
     }
 
     @Override

@@ -34,6 +34,26 @@ public class AdminController {
 
     @FXML private AnchorPane rootAnchorPane;
 
+//    управління задачами filtration
+    @FXML private ToggleButton tgbUndone;
+    @FXML private ToggleButton tgbDone;
+    @FXML private ToggleButton tgbAll;
+
+    @FXML private DatePicker dpTaskDateFrom;
+    @FXML private DatePicker dpTaskDateTo;
+
+    @FXML private CheckBox checkboxTask;
+
+    @FXML private ChoiceBox<User> chbTaskAuthor;
+    @FXML private ChoiceBox<User> chbTaskExecutor;
+
+//    set task parameters
+
+    @FXML private CheckBox chekboxSetTask;
+    @FXML private DatePicker chbSetTaskDateTo;
+    @FXML private ChoiceBox<User> chbSetTaskExecutor;
+
+
     //поля вводу данних нового користувача
     @FXML private TextField fldChildName;
     @FXML private DatePicker dpBirthday;
