@@ -7,20 +7,16 @@ import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
+import ua.spro.entity.task.Task;
 import ua.spro.model.action.UserAction;
 import ua.spro.model.action.actions.*;
-import ua.spro.service.ClientService;
-import ua.spro.service.DepartmentService;
-import ua.spro.service.HistoryService;
-import ua.spro.service.StatusService;
-import ua.spro.service.jdbc.ClientServiceImpl;
-import ua.spro.service.jdbc.DepartmentServiceImpl;
-import ua.spro.service.jdbc.HistoryServiceImpl;
-import ua.spro.service.jdbc.StatusServiceImpl;
+import ua.spro.service.*;
+import ua.spro.service.jdbc.*;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 public class AdminModel implements AdminModelInterface{
@@ -30,6 +26,7 @@ public class AdminModel implements AdminModelInterface{
     private HistoryService historyService;
     private StatusService statusService;
     private DepartmentService departmentService;
+    private TaskService taskService;
 
 
     //lists
@@ -37,12 +34,14 @@ public class AdminModel implements AdminModelInterface{
     private ObservableList<Status> statusesList;
     private ObservableList<History> historiesList;
     private ObservableList<Department> departmentsList;
+    private ObservableList<Task> tasksList;
 
 //    empty data for default not null initialization
     private Client noClient;
     private Department noDepartment;
     private Status noStatus;
     private History noHistory;
+    private Task noTask;
 
     private UserAction action;
 
@@ -51,13 +50,14 @@ public class AdminModel implements AdminModelInterface{
         historyService = new HistoryServiceImpl();
         statusService = new StatusServiceImpl();
         departmentService = new DepartmentServiceImpl();
+        taskService = new TaskServiceImpl();
 
 
             clientsList = FXCollections.observableArrayList();
             historiesList = FXCollections.observableArrayList();
             statusesList = FXCollections.observableArrayList();
             departmentsList = FXCollections.observableArrayList();
-
+            tasksList = FXCollections.observableArrayList();
 
         initializeNoData();
         if(ConnectionDBUtil.getInstance().isConnected()){
@@ -73,6 +73,7 @@ public class AdminModel implements AdminModelInterface{
         noStatus = new Status(1, "Нема даних");
         noDepartment = new Department(1, "Нема даних");
         noHistory = new History(1, LocalDateTime.now(),"-", 1);
+        noTask = new Task(1, LocalDateTime.now(), 1, false);
     }
 
     private void setEmptyDataToLists(){
@@ -80,6 +81,7 @@ public class AdminModel implements AdminModelInterface{
         statusesList.add(noStatus);
         departmentsList.add(noDepartment);
         historiesList.add(noHistory);
+        tasksList.add(noTask);
     }
 
     public void reloadLists(){
@@ -87,7 +89,11 @@ public class AdminModel implements AdminModelInterface{
         statusesList.addAll(statusService.getAll());
         departmentsList.clear();
         departmentsList.addAll(departmentService.getAll());
-        historiesList .clear();
+        historiesList.clear();
+
+        tasksList.clear();
+        tasksList.addAll(taskService.getAll());
+
         clientsList.clear();
         clientsList.addAll(clientService.getAll());
 
@@ -185,6 +191,22 @@ public class AdminModel implements AdminModelInterface{
         history.setId( historyService.save(history) );
         historyService.saveLink(client, history);
         historiesList.addAll(history);
+        return false;
+    }
+
+    @Override
+    public boolean addTask(Client client, String comment, User author, User executor, LocalDate dateTo) {
+        System.out.println("AdminModel: addTask");
+        action = new AddTaskAction(comment, dateTo, author, executor);
+        History history = new History(LocalDateTime.now(), action.getDescription(), author.getUserId());
+        history.setId( historyService.save(history) );
+        historyService.saveLink(client, history);
+        historiesList.addAll(history);
+
+        Task task = new Task(LocalDateTime.of(dateTo, LocalTime.MIDNIGHT), executor.getUserId(), false);
+        task.setId( taskService.save(task) );
+        taskService.saveLink(history, task);
+        tasksList.addAll(task);
         return false;
     }
 

@@ -7,6 +7,8 @@ import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
 
+import java.time.LocalDate;
+
 public interface AdminModelInterface {
 
     boolean saveClient(Client newClient, User user);
@@ -18,6 +20,8 @@ public interface AdminModelInterface {
     boolean setStatus(ObservableList<Client> selectedClients, Status newValue, User user);
 
     boolean addComment(Client client, String comment, User user);
+
+    boolean addTask(Client client, String comment, User author, User executor, LocalDate dateTo);
 
     boolean editComment(Client client, History history, String oldValue, String newValue, User user);
 

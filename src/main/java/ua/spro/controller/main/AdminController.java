@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -23,12 +24,16 @@ import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
+import ua.spro.entity.task.TaskExt;
 import ua.spro.model.admin.AdminModelInterface;
 import ua.spro.model.user.UserModelInterface;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Formatter;
+
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 public class AdminController {
 
@@ -38,6 +43,10 @@ public class AdminController {
     @FXML private ToggleButton tgbUndone;
     @FXML private ToggleButton tgbDone;
     @FXML private ToggleButton tgbAll;
+
+    @FXML private ToggleButton tgbDay;
+    @FXML private ToggleButton tgbWeek;
+    @FXML private ToggleButton tgbMonth;
 
     @FXML private DatePicker dpTaskDateFrom;
     @FXML private DatePicker dpTaskDateTo;
@@ -50,8 +59,18 @@ public class AdminController {
 //    set task parameters
 
     @FXML private CheckBox chekboxSetTask;
-    @FXML private DatePicker chbSetTaskDateTo;
+    @FXML private DatePicker dpSetTaskDateTo;
     @FXML private ChoiceBox<User> chbSetTaskExecutor;
+
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+//    table with tasks
+    @FXML private TableView<TaskExt> tblViewTasks;
+    @FXML private TableColumn<TaskExt, LocalDate> clmnTasksDateTo;
+    @FXML private TableColumn<TaskExt, String> clmnTasksComment;
+    @FXML private TableColumn<TaskExt, Integer> clmnTasksAuthor;
+    @FXML private TableColumn<TaskExt, Integer> clmnTasksExecutor;
+    @FXML private TableColumn<TaskExt, Boolean> clmnTasksDone;
 
 
     //поля вводу данних нового користувача
@@ -110,6 +129,7 @@ public class AdminController {
     private ObservableList<Status> statusesList;
     private ObservableList<History> historiesList;
     private ObservableList<Department> departmentsList;
+    private ObservableList<TaskExt> taskExtsList;
 
     private Status newStatus;
     private Department newDepartment;
@@ -143,10 +163,75 @@ public class AdminController {
         historyTableSetup();
         choiseboxesSetup();
         loadLogo();
-        System.out.println("setUp compleeted!");
+        taskControlsInit();
+
 
 
         ABOAdminApp.adminController = this;
+        System.out.println("setUp compleeted!");
+    }
+
+    private void taskControlsInit(){
+        tgbDay.setSelected(true);
+        tgbDayOnAction();
+
+        dpSetTaskDateTo.setValue(LocalDate.now().plusDays(1));
+
+        System.out.println(currentUser);
+
+        chbTaskAuthor.setItems(users);
+        chbTaskAuthor.setValue(currentUser);
+
+        chbTaskExecutor.setItems(users);
+        chbTaskExecutor.setValue(currentUser);
+
+        chbSetTaskExecutor.setItems(users);
+        chbSetTaskExecutor.setValue(currentUser);
+        System.out.println("getvalue " + chbTaskExecutor.getValue() );
+        taskChBoxesSetup();
+        activateTaskControls();
+    }
+
+    private void taskChBoxesSetup(){
+        chbTaskAuthor.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("chbTaskAuthor on action");
+            }
+        });
+
+        chbTaskExecutor.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("chbTaskExecutor on action");
+            }
+        });
+    }
+
+    private void activateTaskControls(){
+        if(checkboxTask.isSelected()){
+            tgbDay.setDisable(false);
+            tgbWeek.setDisable(false);
+            tgbMonth.setDisable(false);
+            tgbDone.setDisable(false);
+            tgbUndone.setDisable(false);
+            tgbAll.setDisable(false);
+            dpTaskDateFrom.setDisable(false);
+            dpTaskDateTo.setDisable(false);
+            chbTaskAuthor.setDisable(false);
+            chbTaskExecutor.setDisable(false);
+        }else {
+            tgbDay.setDisable(true);
+            tgbWeek.setDisable(true);
+            tgbMonth.setDisable(true);
+            tgbDone.setDisable(true);
+            tgbUndone.setDisable(true);
+            tgbAll.setDisable(true);
+            dpTaskDateFrom.setDisable(true);
+            dpTaskDateTo.setDisable(true);
+            chbTaskAuthor.setDisable(true);
+            chbTaskExecutor.setDisable(true);
+        }
     }
 
     private void setCurrents(){
@@ -662,10 +747,22 @@ public class AdminController {
 
     public void btnAddHistoryOnAction(){
        String newComment = txtAreaNewComment.getText();
-        if(!newComment.equals("") && currentClient!= null){
-            adminModel.addComment(currentClient, newComment, userModel.getCurrentUser());
-        }
+           if (!newComment.equals("") && currentClient != null) {
+               if(!chekboxSetTask.isSelected()) {
+               adminModel.addComment(currentClient, newComment, userModel.getCurrentUser());
+               }else {
+                   System.out.println("Create new Task");
+                   User executor = chbSetTaskExecutor.getValue();
+                   LocalDate dateTo = dpSetTaskDateTo.getValue();
+                   if(executor != null && dateTo != null) {
+                       adminModel.addTask(currentClient, newComment, userModel.getCurrentUser(), executor, dateTo);
+                   }else {
+                       System.out.println("Fill all inputs!");
+                   }
+               }
+           }
         txtAreaNewComment.clear();
+
     }
 
     public void tblViewClientsOnMouseClicked(){
@@ -762,9 +859,9 @@ public class AdminController {
 
     public void ButtonOnAction() {
 
-//        System.out.println(currentClient);
-//        tblViewClients.getFocusModel().focus(2);
-//        tblViewClients.
+        System.out.println(currentUser);
+        chbTaskAuthor.getSelectionModel().select(users.indexOf(currentUser));
+//        chbTaskAuthor
 
     }
 
@@ -828,4 +925,62 @@ public class AdminController {
             btnSaveContactOnAction();
         }
     }
+
+
+
+
+    public void tgbAllOnAction(ActionEvent event) {
+
+    }
+
+
+    public void tgbDoneOnAction(ActionEvent event) {
+
+    }
+
+
+    public void tgbUndoneOnAction(ActionEvent event) {
+
+    }
+
+
+    public void tgbDayOnAction() {
+        dateFrom = dateTo = LocalDate.now();
+        dpTaskDateFrom.setValue(dateFrom);
+        dpTaskDateTo.setValue(dateFrom);
+//        get  new info
+    }
+
+
+    public void tgbWeekOnAction() {
+        LocalDate now = LocalDate.now();
+        dateFrom = now.minusDays( (now.getDayOfWeek().getValue() -1) );
+        dateTo = now.plusDays( (7 - now.getDayOfWeek().getValue())  ) ;
+        dpTaskDateFrom.setValue(dateFrom);
+        dpTaskDateTo.setValue(dateTo);
+        //        get  new info
+    }
+
+
+    public void tgbMonthOnAction() {
+        LocalDate now = LocalDate.now();
+        dateFrom = now.withDayOfMonth(1);
+        dateTo = now.with(lastDayOfMonth());
+        dpTaskDateFrom.setValue(dateFrom);
+        dpTaskDateTo.setValue(dateTo);
+        //        get  new info
+    }
+
+    public void dpTaskDateFromOnAction(ActionEvent event) {
+        System.out.println("DateFrom on action");
+    }
+
+    public void dpTaskDateToOnAction(ActionEvent event) {
+        System.out.println("DateTo on action");
+    }
+
+    public void checkboxTaskOnAction(ActionEvent event){
+        activateTaskControls();
+    }
+
 }

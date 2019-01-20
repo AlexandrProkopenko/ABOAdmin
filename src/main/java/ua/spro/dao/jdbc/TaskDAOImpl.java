@@ -102,7 +102,7 @@ public class TaskDAOImpl implements TaskDAO, Observer {
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
                     "SELECT * " +
-                            "FROM histories  "
+                            "FROM tasks  "
 
             );
 

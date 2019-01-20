@@ -20,6 +20,7 @@ public class Task {
     }
 
     public Task(LocalDateTime endDate, Integer executorId, Boolean done) {
+        this.id = new SimpleIntegerProperty(this, "id");
         this.endDate = new SimpleObjectProperty<>(this, "endDate", endDate);
         this.executorId = new SimpleIntegerProperty(this, "executorId", executorId);
         this.done = new SimpleBooleanProperty(this, "done", done);
