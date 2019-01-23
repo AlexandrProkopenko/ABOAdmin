@@ -8,6 +8,8 @@ import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
 import ua.spro.entity.task.Task;
+import ua.spro.entity.task.TaskExt;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.model.action.UserAction;
 import ua.spro.model.action.actions.*;
 import ua.spro.service.*;
@@ -34,14 +36,14 @@ public class AdminModel implements AdminModelInterface{
     private ObservableList<Status> statusesList;
     private ObservableList<History> historiesList;
     private ObservableList<Department> departmentsList;
-    private ObservableList<Task> tasksList;
+    private ObservableList<TaskExt> taskExtsList;
 
 //    empty data for default not null initialization
     private Client noClient;
     private Department noDepartment;
     private Status noStatus;
     private History noHistory;
-    private Task noTask;
+    private TaskExt noTaskExt;
 
     private UserAction action;
 
@@ -57,7 +59,7 @@ public class AdminModel implements AdminModelInterface{
             historiesList = FXCollections.observableArrayList();
             statusesList = FXCollections.observableArrayList();
             departmentsList = FXCollections.observableArrayList();
-            tasksList = FXCollections.observableArrayList();
+            taskExtsList = FXCollections.observableArrayList();
 
         initializeNoData();
         if(ConnectionDBUtil.getInstance().isConnected()){
@@ -73,7 +75,7 @@ public class AdminModel implements AdminModelInterface{
         noStatus = new Status(1, "Нема даних");
         noDepartment = new Department(1, "Нема даних");
         noHistory = new History(1, LocalDateTime.now(),"-", 1);
-        noTask = new Task(1, LocalDateTime.now(), 1, false);
+        noTaskExt = new TaskExt(1, LocalDateTime.now(), 1, false, "noComments", 1);
     }
 
     private void setEmptyDataToLists(){
@@ -81,7 +83,7 @@ public class AdminModel implements AdminModelInterface{
         statusesList.add(noStatus);
         departmentsList.add(noDepartment);
         historiesList.add(noHistory);
-        tasksList.add(noTask);
+        taskExtsList.add(noTaskExt);
     }
 
     public void reloadLists(){
@@ -91,8 +93,8 @@ public class AdminModel implements AdminModelInterface{
         departmentsList.addAll(departmentService.getAll());
         historiesList.clear();
 
-        tasksList.clear();
-        tasksList.addAll(taskService.getAll());
+        taskExtsList.clear();
+
 
         clientsList.clear();
         clientsList.addAll(clientService.getAll());
@@ -206,7 +208,8 @@ public class AdminModel implements AdminModelInterface{
         Task task = new Task(LocalDateTime.of(dateTo, LocalTime.MIDNIGHT), executor.getUserId(), false);
         task.setId( taskService.save(task) );
         taskService.saveLink(history, task);
-        tasksList.addAll(task);
+        TaskExt taskExt = new TaskExt(task.getId(), task.getEndDate(), executor.getUserId(), false, comment, author.getUserId());
+        taskExtsList.addAll(taskExt);
         return false;
     }
 
@@ -266,11 +269,75 @@ public class AdminModel implements AdminModelInterface{
     }
 
     @Override
+    public boolean getClientsByFilters(Status status, Department department,
+                                       LocalDate dateFrom, LocalDate dateTo, TaskSelectType taskSelectType, User author, User executor) {
+        if (status == null) {
+            for (Status s : statusesList) {
+                if (s.getClientStatus().equals("Всі")) {
+                    status = s;
+                }
+            }
+        }
+
+        if (department == null) {
+            for (Department dep : departmentsList) {
+                if (dep.getClientDepartment().equals("Всі")) {
+                    department = dep;
+                }
+            }
+        }
+        if(status == null){
+            status = noStatus;
+        }
+        if(department == null){
+            department = noDepartment;
+        }
+
+        System.out.println("AdminModel:   get Clients by Filters");
+        System.out.println("status: " + status.getClientStatus());
+        System.out.println("department: " + department.getClientDepartment());
+        System.out.println("dateFrom: " + dateFrom);
+        System.out.println("dateTo: " + dateTo);
+        System.out.println("taskSelectType: " + taskSelectType);
+        System.out.println("author: " + author.getLogin());
+        System.out.println("executor: " + executor.getLogin());
+
+        clientsList.clear();
+        clientsList.addAll(clientService.getClientsByFilters(status, department, dateFrom, dateTo, taskSelectType, author, executor));
+
+        return false;
+    }
+
+    @Override
     public boolean getHistoriesByClient(Client client) {
         System.out.println("AdminModel: getHistoriesByClient");
         historiesList.clear();
         historiesList.addAll(historyService.getByClient(client));
         return true;
+    }
+
+    @Override
+    public boolean getTasksForCurrentHistoriesList(TaskSelectType taskSelectType) {
+        System.out.println("AdminModel: getHTasksByClient");
+        taskExtsList.clear();
+        taskExtsList.addAll( taskService.getByHistories(historiesList, taskSelectType) );
+        return true;
+    }
+
+    @Override
+    public boolean updateTaskDone(TaskExt taskExt, Boolean newValue, User author, Client client) {
+        System.out.println("AdminModel: updateTaskDone");
+        action = new EditTaskDoneAction(taskExt.getComment(), newValue);
+        History historyAction = new History(LocalDateTime.now(), action.getDescription(), author.getUserId());
+
+        System.out.println(taskExt.getId());
+
+        taskService.updateDone(taskExt);
+        historyService.save(historyAction);
+        historyService.saveLink(client, historyAction);
+        historiesList.add(historyAction);
+
+        return false;
     }
 
     @Override
@@ -293,4 +360,8 @@ public class AdminModel implements AdminModelInterface{
         return departmentsList;
     }
 
+    @Override
+    public ObservableList<TaskExt> getTaskExtsList() {
+        return taskExtsList;
+    }
 }

@@ -6,6 +6,8 @@ import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
+import ua.spro.entity.task.TaskExt;
+import ua.spro.entity.task.TaskSelectType;
 
 import java.time.LocalDate;
 
@@ -37,15 +39,18 @@ public interface AdminModelInterface {
 
     ObservableList<History> getHistoriesList();
 
+    ObservableList<TaskExt> getTaskExtsList();
 
+    boolean getClientsByFilters(Status status, Department department,
+                                LocalDate dateFrom, LocalDate dateTo, TaskSelectType taskSelectType, User author, User executor);
 
     boolean getClientsByStatusAndDepartment(Status status, Department department);
 
     boolean getHistoriesByClient(Client client);
 
+    boolean getTasksForCurrentHistoriesList(TaskSelectType taskSelectType);
 
-
-
+    boolean updateTaskDone(TaskExt taskExt, Boolean newValue, User author, Client client);
 
 
 }

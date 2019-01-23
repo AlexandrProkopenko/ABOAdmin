@@ -6,6 +6,8 @@ import ua.spro.dao.jdbc.TaskDAOImpl;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.History;
 import ua.spro.entity.task.Task;
+import ua.spro.entity.task.TaskExt;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.service.TaskService;
 
 public class TaskServiceImpl implements TaskService {
@@ -32,8 +34,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public boolean updateDone(Task task) {
-        return dao.updateDone(task);
+    public boolean updateDone(TaskExt taskExt) {
+        return dao.updateDone(taskExt);
     }
 
     @Override
@@ -52,7 +54,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public ObservableList<Task> getByClient(Client client) {
-        return dao.getByClient(client);
+    public ObservableList<TaskExt> getByHistories(ObservableList<History> histories, TaskSelectType taskSelectType) {
+        return dao.getByHistories(histories, taskSelectType);
     }
 }

@@ -16,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import ua.spro.ABOAdminApp;
 import ua.spro.controller.MainController;
@@ -25,8 +26,10 @@ import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
 import ua.spro.entity.User;
 import ua.spro.entity.task.TaskExt;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.model.admin.AdminModelInterface;
 import ua.spro.model.user.UserModelInterface;
+import ua.spro.util.tablecells.BooleanCell;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,10 +42,10 @@ public class AdminController {
 
     @FXML private AnchorPane rootAnchorPane;
 
-//    управління задачами filtration
-    @FXML private ToggleButton tgbUndone;
-    @FXML private ToggleButton tgbDone;
-    @FXML private ToggleButton tgbAll;
+//    управління задачами filtration clients by task parameters
+    @FXML private ToggleButton tgbUndoneClient;
+    @FXML private ToggleButton tgbDoneClient;
+    @FXML private ToggleButton tgbAllClient;
 
     @FXML private ToggleButton tgbDay;
     @FXML private ToggleButton tgbWeek;
@@ -61,12 +64,17 @@ public class AdminController {
     @FXML private CheckBox chekboxSetTask;
     @FXML private DatePicker dpSetTaskDateTo;
     @FXML private ChoiceBox<User> chbSetTaskExecutor;
+// filtration tasks of current client
+    @FXML private ToggleButton tgbUndoneTask;
+    @FXML private ToggleButton tgbDoneTask;
+    @FXML private ToggleButton tgbAllTask;
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
 //    table with tasks
     @FXML private TableView<TaskExt> tblViewTasks;
-    @FXML private TableColumn<TaskExt, LocalDate> clmnTasksDateTo;
+    @FXML private TableColumn<TaskExt, Void> clmnTasksNum;
+    @FXML private TableColumn<TaskExt, LocalDateTime> clmnTasksDateTo;
     @FXML private TableColumn<TaskExt, String> clmnTasksComment;
     @FXML private TableColumn<TaskExt, Integer> clmnTasksAuthor;
     @FXML private TableColumn<TaskExt, Integer> clmnTasksExecutor;
@@ -139,6 +147,11 @@ public class AdminController {
     private User currentUser;
     private ObservableList<User> users;
 
+    private TaskSelectType taskSelectType;
+    private TaskSelectType taskSelectTypeClient;
+    private User authorFilter;
+    private User executorFilter;
+    private boolean datePickerFlag = false;
 
     private MainController mainController;
     private Stage mainStage;
@@ -173,7 +186,9 @@ public class AdminController {
 
     private void taskControlsInit(){
         tgbDay.setSelected(true);
-        tgbDayOnAction();
+        dateFrom = dateTo = LocalDate.now();
+        dpTaskDateFrom.setValue(dateFrom);
+        dpTaskDateTo.setValue(dateFrom);
 
         dpSetTaskDateTo.setValue(LocalDate.now().plusDays(1));
 
@@ -181,15 +196,107 @@ public class AdminController {
 
         chbTaskAuthor.setItems(users);
         chbTaskAuthor.setValue(currentUser);
+        authorFilter = chbTaskAuthor.getValue();
 
         chbTaskExecutor.setItems(users);
         chbTaskExecutor.setValue(currentUser);
+        executorFilter = chbTaskExecutor.getValue();
 
         chbSetTaskExecutor.setItems(users);
         chbSetTaskExecutor.setValue(currentUser);
+
+        tblViewTasksSetup();
+
         System.out.println("getvalue " + chbTaskExecutor.getValue() );
         taskChBoxesSetup();
         activateTaskControls();
+
+        taskSelectType = TaskSelectType.UNDONE;
+        taskSelectTypeClient = TaskSelectType.UNDONE;
+    }
+
+    private void tblViewTasksSetup(){
+        //звязування колонок таблиці з класами
+        clmnTasksNum.setCellValueFactory(new PropertyValueFactory<TaskExt, Void>("№"));
+        clmnTasksNum.setCellFactory(col -> new TableCell<TaskExt, Void>() {
+            @Override
+            public void updateIndex(int index) {
+                super.updateIndex(index);
+                if (isEmpty() || index < 0) {
+                    setText(null);
+                } else {
+                    setText(Integer.toString(index+1));
+                }
+            }
+        });
+
+//        clmnTasksDateTo.setCellValueFactory(cellData -> cellData.getValue().dateTimeProperty());
+        clmnTasksDateTo.setCellValueFactory(new PropertyValueFactory<TaskExt, LocalDateTime>("endDate"));
+        clmnTasksDateTo.setCellFactory(col -> new TableCell<TaskExt, LocalDateTime>(){
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                Formatter formatter = new Formatter();
+
+                if (empty)
+                    setText(null);
+                else {
+                    formatter.format("%tF", item);
+                    setText(formatter.toString());
+                    formatter.close();
+                }
+            }
+        });
+
+
+        clmnTasksComment.setCellValueFactory(new PropertyValueFactory<TaskExt, String>("comment"));
+        clmnTasksComment.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        clmnTasksAuthor.setCellValueFactory(new PropertyValueFactory<TaskExt, Integer>("authorId"));
+        clmnHistoriesAuthor.setCellFactory(column -> {
+            return new TableCell<History, Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? "" : users.get(item-1).getLogin());
+                }
+            }; });
+        clmnTasksExecutor.setCellValueFactory(new PropertyValueFactory<TaskExt, Integer>("executorId"));
+        clmnHistoriesAuthor.setCellFactory(column -> {
+            return new TableCell<History, Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? "" : users.get(item-1).getLogin());
+                }
+            };
+        }
+            );
+
+//        clmnTasksDone.setCellValueFactory(new PropertyValueFactory<TaskExt, Boolean>("done"));
+//        clmnTasksDone.setCellFactory(column -> {return new BooleanCell();});
+
+
+        Callback<TableColumn<TaskExt, Boolean>, TableCell<TaskExt, Boolean>> booleanCellFactory =
+                new Callback<TableColumn<TaskExt, Boolean>, TableCell<TaskExt, Boolean>>() {
+                    @Override
+                    public TableCell<TaskExt, Boolean> call(TableColumn<TaskExt, Boolean> p) {
+                        return new BooleanCell();
+                    }
+                };
+        clmnTasksDone.setCellValueFactory(new PropertyValueFactory<TaskExt, Boolean>("done"));
+        clmnTasksDone.setCellFactory(booleanCellFactory);
+        clmnTasksDone.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<TaskExt, Boolean>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<TaskExt, Boolean> event) {
+                Boolean newValue = event.getNewValue();
+                TaskExt taskExt = tblViewTasks.getSelectionModel().getSelectedItem();
+                adminModel.updateTaskDone(taskExt, newValue, currentUser, currentClient);
+                adminModel.getTasksForCurrentHistoriesList(taskSelectType);
+            }
+        });
+
+        tblViewTasks.setItems(taskExtsList);
     }
 
     private void taskChBoxesSetup(){
@@ -197,6 +304,8 @@ public class AdminController {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("chbTaskAuthor on action");
+                authorFilter = chbTaskAuthor.getValue();
+                adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
             }
         });
 
@@ -204,8 +313,12 @@ public class AdminController {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("chbTaskExecutor on action");
+                executorFilter = chbTaskExecutor.getValue();
+                adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
             }
         });
+
+
     }
 
     private void activateTaskControls(){
@@ -213,9 +326,9 @@ public class AdminController {
             tgbDay.setDisable(false);
             tgbWeek.setDisable(false);
             tgbMonth.setDisable(false);
-            tgbDone.setDisable(false);
-            tgbUndone.setDisable(false);
-            tgbAll.setDisable(false);
+            tgbDoneClient.setDisable(false);
+            tgbUndoneClient.setDisable(false);
+            tgbAllClient.setDisable(false);
             dpTaskDateFrom.setDisable(false);
             dpTaskDateTo.setDisable(false);
             chbTaskAuthor.setDisable(false);
@@ -224,9 +337,9 @@ public class AdminController {
             tgbDay.setDisable(true);
             tgbWeek.setDisable(true);
             tgbMonth.setDisable(true);
-            tgbDone.setDisable(true);
-            tgbUndone.setDisable(true);
-            tgbAll.setDisable(true);
+            tgbDoneClient.setDisable(true);
+            tgbUndoneClient.setDisable(true);
+            tgbAllClient.setDisable(true);
             dpTaskDateFrom.setDisable(true);
             dpTaskDateTo.setDisable(true);
             chbTaskAuthor.setDisable(true);
@@ -262,7 +375,7 @@ public class AdminController {
         statusesList = adminModel.getStatusesList();
         historiesList = adminModel.getHistoriesList();
         departmentsList = adminModel.getDepartmentsList();
-
+        taskExtsList = adminModel.getTaskExtsList();
         setCurrents();
     }
 
@@ -556,6 +669,7 @@ public class AdminController {
         currentTooltip = new Tooltip();
         tblViewHistories.setTooltip(currentTooltip);
         tblViewHistories.setEditable(true);
+        clmnHistoriesComment.setEditable(true);
         tblViewHistories.setItems(historiesList);
     }
 
@@ -631,6 +745,7 @@ public class AdminController {
             public void handle(ActionEvent event) {
                 filterStatus = chbStatuses.getValue();
                 adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
             }
         });
 
@@ -648,6 +763,7 @@ public class AdminController {
             public void handle(ActionEvent event) {
                 filterDepartment = chbDepartments.getValue();
                 adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
             }
         });
 
@@ -772,9 +888,12 @@ public class AdminController {
             if(selectedClients.size()>1){
                 historiesList.clear();
             }else {
+                if(currentClient == selectedClients.get(0)) return;
+
                 currentClient = selectedClients.get(0);
                 if (currentClient != null) {
                     adminModel.getHistoriesByClient(currentClient);
+                    adminModel.getTasksForCurrentHistoriesList(taskSelectType);
                     currentHistory = historiesList.get(0);
 
                     if (currentHistory != null) {
@@ -929,26 +1048,55 @@ public class AdminController {
 
 
 
-    public void tgbAllOnAction(ActionEvent event) {
-
+    public void tgbAllClientOnAction(ActionEvent event) {
+        taskSelectTypeClient = TaskSelectType.ALL;
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
 
-    public void tgbDoneOnAction(ActionEvent event) {
-
+    public void tgbDoneClientOnAction(ActionEvent event) {
+        taskSelectTypeClient = TaskSelectType.DONE;
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
 
-    public void tgbUndoneOnAction(ActionEvent event) {
+    public void tgbUndoneClientOnAction(ActionEvent event) {
+        taskSelectTypeClient = TaskSelectType.UNDONE;
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+    }
 
+    public void tgbAllTaskOnAction(ActionEvent event) {
+        taskSelectType = TaskSelectType.ALL;
+        if(!historiesList.isEmpty()) {
+            adminModel.getTasksForCurrentHistoriesList(taskSelectType);
+        }
+    }
+
+
+    public void tgbDoneTaskOnAction(ActionEvent event) {
+        taskSelectType = TaskSelectType.DONE;
+        if(!historiesList.isEmpty()) {
+            adminModel.getTasksForCurrentHistoriesList(taskSelectType);
+        }
+    }
+
+
+    public void tgbUndoneTaskOnAction(ActionEvent event) {
+        taskSelectType = TaskSelectType.UNDONE;
+        if(!historiesList.isEmpty()) {
+            adminModel.getTasksForCurrentHistoriesList(taskSelectType);
+        }
     }
 
 
     public void tgbDayOnAction() {
         dateFrom = dateTo = LocalDate.now();
+        datePickerFlag = true;
         dpTaskDateFrom.setValue(dateFrom);
+        datePickerFlag = true;
         dpTaskDateTo.setValue(dateFrom);
 //        get  new info
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
 
@@ -956,9 +1104,12 @@ public class AdminController {
         LocalDate now = LocalDate.now();
         dateFrom = now.minusDays( (now.getDayOfWeek().getValue() -1) );
         dateTo = now.plusDays( (7 - now.getDayOfWeek().getValue())  ) ;
+        datePickerFlag = true;
         dpTaskDateFrom.setValue(dateFrom);
+        datePickerFlag = true;
         dpTaskDateTo.setValue(dateTo);
         //        get  new info
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
 
@@ -966,17 +1117,32 @@ public class AdminController {
         LocalDate now = LocalDate.now();
         dateFrom = now.withDayOfMonth(1);
         dateTo = now.with(lastDayOfMonth());
+        datePickerFlag = true;
         dpTaskDateFrom.setValue(dateFrom);
+        datePickerFlag = true;
         dpTaskDateTo.setValue(dateTo);
         //        get  new info
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
     public void dpTaskDateFromOnAction(ActionEvent event) {
         System.out.println("DateFrom on action");
+        if(datePickerFlag){
+            datePickerFlag = false;
+            return;
+        }
+//        System.out.println(event.);
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
     public void dpTaskDateToOnAction(ActionEvent event) {
         System.out.println("DateTo on action");
+        System.out.println(event.getSource());
+        if(datePickerFlag){
+            datePickerFlag = false;
+            return;
+        }
+        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
     }
 
     public void checkboxTaskOnAction(ActionEvent event){

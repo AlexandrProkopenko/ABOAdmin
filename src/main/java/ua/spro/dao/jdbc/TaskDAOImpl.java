@@ -6,6 +6,8 @@ import ua.spro.dao.TaskDAO;
 import ua.spro.entity.client.Client;
 import ua.spro.entity.client.History;
 import ua.spro.entity.task.Task;
+import ua.spro.entity.task.TaskExt;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.util.ConnectionDBUtil;
 
 import java.sql.*;
@@ -73,15 +75,15 @@ public class TaskDAOImpl implements TaskDAO, Observer {
     }
 
     @Override
-    public boolean updateDone(Task task) {
+    public boolean updateDone(TaskExt taskExt) {
         try (Connection c = DriverManager.getConnection(
                 url, login, password)){
 
             PreparedStatement statement = c.prepareStatement(
                     "UPDATE tasks SET done = ? WHERE task_id = ?;"
             );
-            statement.setBoolean(1, task.isDone() ? false : true );
-            statement.setInt(2, task.getId());
+            statement.setBoolean(1, taskExt.isDone() ? false : true );
+            statement.setInt(2, taskExt.getId());
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,44 +151,97 @@ public class TaskDAOImpl implements TaskDAO, Observer {
     }
 
     @Override
-    public ObservableList<Task> getByClient(Client client) {
-        /*
-        ObservableList<History> list = FXCollections.observableArrayList();
-        Integer id = client.getId();
+    public ObservableList<TaskExt> getByHistories(ObservableList<History> histories, TaskSelectType taskSelectType) {
+
+        ObservableList<TaskExt> list = FXCollections.observableArrayList();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
-            PreparedStatement statement = c.prepareStatement(
-                    "select cl.client_id, h.date_h, h.note, h.user_id\n" +
-                            "from clients cl\n" +
-                            "join clients_history ch\n" +
-                            "on cl.client_id = ch.client_id\n" +
-                            "left join histories h\n" +
-                            "on ch.history_id = h.history_id\n" +
-                            "having cl.client_id = ?  "
 
-            );
-            statement.setInt(1, id);
+            for(History history: histories) {
+                PreparedStatement statement = null;
+                switch (taskSelectType){
+                    case ALL:
+                        statement = c.prepareStatement(
+                                "select h.history_id , t.task_id, t.end_date, t.executor_id, t.done\n" +
+                                        "from histories h \n" +
+                                        "join histories_tasks ht\n" +
+                                        "on h.history_id = ht.history_id \n" +
+                                        "left join tasks t\n" +
+                                        "on ht.task_id = t.task_id\n" +
+                                        "having h.history_id = ?; "
+
+                        );
+                        statement.setInt(1, history.getId());
+                        break;
+
+                    case DONE:
+                        statement = c.prepareStatement(
+                                "select h.history_id , t.task_id, t.end_date, t.executor_id, t.done\n" +
+                                        "from histories h \n" +
+                                        "join histories_tasks ht\n" +
+                                        "on h.history_id = ht.history_id \n" +
+                                        "left join tasks t\n" +
+                                        "on ht.task_id = t.task_id\n" +
+                                        "having h.history_id = ? and t.done = true; "
+
+                        );
+                        statement.setInt(1, history.getId());
+                        break;
+                    case UNDONE:
+                        statement = c.prepareStatement(
+                                "select h.history_id , t.task_id, t.end_date, t.executor_id, t.done\n" +
+                                        "from histories h \n" +
+                                        "join histories_tasks ht\n" +
+                                        "on h.history_id = ht.history_id \n" +
+                                        "left join tasks t\n" +
+                                        "on ht.task_id = t.task_id\n" +
+                                        "having h.history_id = ? and t.done = false; "
+
+                        );
+                        statement.setInt(1, history.getId());
+                        break;
+
+                        default:
+                            break;
+                }
 
 
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
 
-                list.add(new History(
-                        resultSet.getInt(1),
-                        (resultSet.getTimestamp(2)).toLocalDateTime(),
-                        resultSet.getString(3),
-                        resultSet.getInt(4)
-                ));
+                if(statement == null) return null;
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+
+                    list.add(new TaskExt(
+                            resultSet.getInt(2),
+                            (resultSet.getTimestamp(3)).toLocalDateTime(),
+                            resultSet.getInt(4),
+                            resultSet.getBoolean(5),
+                            formatComment(history.getComment()),
+                            history.getUserId()
+                    ));
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        for(History n: list){
-            System.out.println(n);
+        System.out.println("TasksExtList in Task DAO:");
+        for(TaskExt t: list){
+
+            System.out.println(t);
         }
         return list;
-        */
-        return null;
+
+    }
+
+    private String formatComment(String comment){
+        if(comment == null) return null;
+        int start = comment.indexOf('.') + 2;
+        int end = comment.lastIndexOf("для");
+//        System.out.println("start " + start + " end " + end);
+        if(start != -1 && end != -1) {
+            comment = comment.substring(start, end);
+        }
+        return comment;
     }
 
     @Override

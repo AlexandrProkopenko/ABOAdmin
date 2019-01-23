@@ -116,7 +116,7 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
         Integer id = client.getId();
         try(Connection c = DriverManager.getConnection(url, login, password)) {
             PreparedStatement statement = c.prepareStatement(
-                    "select cl.client_id, h.date_h, h.note, h.user_id\n" +
+                    "select cl.client_id, h.history_id, h.date_h, h.note, h.user_id\n" +
                             "from clients cl\n" +
                             "join clients_history ch\n" +
                             "on cl.client_id = ch.client_id\n" +
@@ -132,10 +132,10 @@ public class HistoryDAOImpl implements HistoryDAO, Observer {
             while (resultSet.next()) {
 
                 list.add(new History(
-                        resultSet.getInt(1),
-                        (resultSet.getTimestamp(2)).toLocalDateTime(),
-                        resultSet.getString(3),
-                        resultSet.getInt(4)
+                        resultSet.getInt(2),
+                        (resultSet.getTimestamp(3)).toLocalDateTime(),
+                        resultSet.getString(4),
+                        resultSet.getInt(5)
                 ));
             }
 

@@ -12,6 +12,8 @@ public class TaskExt extends Task {
     private StringProperty comment;
     private IntegerProperty authorId;
 
+
+
     public TaskExt(Integer id, LocalDateTime endDate, Integer executorId, Boolean done, String comment, Integer authorId) {
         super(id, endDate, executorId, done);
         this.comment = new SimpleStringProperty(this, "comment", comment);
@@ -58,11 +60,11 @@ public class TaskExt extends Task {
 
     @Override
     public String toString() {
-
-        return super.toString() +
+//        String s = super.toString();
+        return
                 "TaskExt{" +
-                "comment=" + comment +
-                ", authorId=" + authorId +
+                "comment=" + comment.get() +
+                ", authorId=" + authorId.get() +
                 '}';
     }
 }

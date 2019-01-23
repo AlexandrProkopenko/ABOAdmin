@@ -7,8 +7,10 @@ import ua.spro.entity.client.Client;
 import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.service.ClientService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ClientServiceImpl implements ClientService {
@@ -76,7 +78,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor) {
+    public ObservableList<Client> getClientsByFilters(Status status, Department department, LocalDate dateFrom, LocalDate dateTo, TaskSelectType taskSelectType, User author, User executor) {
         return null;
     }
 }

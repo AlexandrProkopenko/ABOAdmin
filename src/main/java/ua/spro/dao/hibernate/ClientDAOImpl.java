@@ -13,10 +13,12 @@ import ua.spro.entity.client.Client;
 import ua.spro.entity.client.Department;
 import ua.spro.entity.client.History;
 import ua.spro.entity.client.Status;
+import ua.spro.entity.task.TaskSelectType;
 import ua.spro.util.ConnectionDBUtil;
 import ua.spro.util.HibernateUtil;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Observable;
 import java.util.Observer;
@@ -365,7 +367,8 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     }
 
     @Override
-    public ObservableList<Client> getClientsByStatusDepStartEndAuthorExecutor(Status status, Department department, LocalDateTime startDate, LocalDateTime endDate, User author, User executor) {
+    public ObservableList<Client> getClientsByFilters(Status status, Department department,
+                                                      LocalDate dateFrom, LocalDate dateTo, TaskSelectType taskSelectType, User author, User executor) {
         return null;
     }
 

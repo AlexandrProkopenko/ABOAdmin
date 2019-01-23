@@ -60,7 +60,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <TableView fx:id="tblViewHistories" layoutY="57.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" onMouseClicked="#tblViewHistoriesOnMouseClicked" onMouseEntered="#tblViewHistoriesOnMouseEntered" onMouseExited="#tblViewHistoriesOnMouseExited" prefHeight="374.0" prefWidth="497.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="57.0">
+      <TableView fx:id="tblViewHistories" editable="true" layoutY="57.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="100.0" minWidth="100.0" onMouseClicked="#tblViewHistoriesOnMouseClicked" onMouseEntered="#tblViewHistoriesOnMouseEntered" onMouseExited="#tblViewHistoriesOnMouseExited" prefHeight="374.0" prefWidth="497.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="57.0">
          <columns>
             <TableColumn fx:id="clmnHistoriesDate" prefWidth="88.0" text="Дата" />
             <TableColumn fx:id="clmnHistoriesComment" minWidth="0.0" prefWidth="311.0" text="Коментар" />
@@ -116,12 +116,12 @@
             </CheckBox>
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.valignment="CENTER">
                <children>
-                  <ToggleButton fx:id="tgbUndone" mnemonicParsing="false" onAction="#tgbUndoneOnAction" prefHeight="25.0" prefWidth="36.0" selected="true" text="X">
+                  <ToggleButton fx:id="tgbUndoneClient" mnemonicParsing="false" onAction="#tgbUndoneClientOnAction" prefHeight="25.0" prefWidth="36.0" selected="true" text="X">
                      <toggleGroup>
                         <ToggleGroup fx:id="done" />
                      </toggleGroup></ToggleButton>
-                  <ToggleButton fx:id="tgbDone" mnemonicParsing="false" onAction="#tgbDoneOnAction" prefHeight="25.0" prefWidth="36.0" text="V" toggleGroup="$done" />
-                  <ToggleButton fx:id="tgbAll" mnemonicParsing="false" onAction="#tgbAllOnAction" prefHeight="25.0" prefWidth="36.0" text="Всі" toggleGroup="$done" />
+                  <ToggleButton fx:id="tgbDoneClient" mnemonicParsing="false" onAction="#tgbDoneClientOnAction" prefHeight="25.0" prefWidth="36.0" text="V" toggleGroup="$done" />
+                  <ToggleButton fx:id="tgbAllClient" mnemonicParsing="false" onAction="#tgbAllClientOnAction" prefHeight="25.0" prefWidth="36.0" text="Всі" toggleGroup="$done" />
                </children>
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3">
@@ -178,24 +178,24 @@
             <Label text="Поточні задачі" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
-                  <ToggleButton fx:id="tgbUndone1" mnemonicParsing="false" onAction="#tgbUndoneOnAction" prefHeight="25.0" prefWidth="36.0" selected="true" text="X">
+                  <ToggleButton fx:id="tgbUndoneTask" mnemonicParsing="false" onAction="#tgbUndoneTaskOnAction" prefHeight="25.0" prefWidth="36.0" selected="true" text="X">
                      <toggleGroup>
                         <ToggleGroup fx:id="done1" />
                      </toggleGroup>
                   </ToggleButton>
-                  <ToggleButton fx:id="tgbDone1" mnemonicParsing="false" onAction="#tgbDoneOnAction" prefHeight="25.0" prefWidth="36.0" text="V" toggleGroup="$done1" />
-                  <ToggleButton fx:id="tgbAll1" mnemonicParsing="false" onAction="#tgbAllOnAction" prefHeight="25.0" prefWidth="36.0" text="Всі" toggleGroup="$done1" />
+                  <ToggleButton fx:id="tgbDoneTask" mnemonicParsing="false" onAction="#tgbDoneTaskOnAction" prefHeight="25.0" prefWidth="36.0" text="V" toggleGroup="$done1" />
+                  <ToggleButton fx:id="tgbAllTask" mnemonicParsing="false" onAction="#tgbAllTaskOnAction" prefHeight="25.0" prefWidth="36.0" text="Всі" toggleGroup="$done1" />
                </children>
             </HBox>
          </children>
       </GridPane>
       <TableView fx:id="tblViewTasks" editable="true" layoutX="767.0" layoutY="567.0" prefHeight="122.0" prefWidth="497.0" AnchorPane.bottomAnchor="44.0" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="567.0">
         <columns>
-          <TableColumn fx:id="clmnTasksNum" prefWidth="28.0" text="№" />
-            <TableColumn fx:id="clmnTasksDateTo" prefWidth="67.0" text="Виконати" />
-          <TableColumn fx:id="clmnTasksComment" prefWidth="229.0" text="Задача" />
-            <TableColumn fx:id="clmnTasksAuthor" prefWidth="43.0" text="Автор" />
-            <TableColumn fx:id="clmnTasksExecutor" prefWidth="77.0" text="Виконавець" />
+          <TableColumn fx:id="clmnTasksNum" editable="false" prefWidth="28.0" text="№" />
+            <TableColumn fx:id="clmnTasksDateTo" editable="false" prefWidth="67.0" text="Виконати" />
+          <TableColumn fx:id="clmnTasksComment" editable="false" prefWidth="229.0" text="Задача" />
+            <TableColumn fx:id="clmnTasksAuthor" editable="false" prefWidth="43.0" text="Автор" />
+            <TableColumn fx:id="clmnTasksExecutor" editable="false" prefWidth="77.0" text="Виконавець" />
             <TableColumn fx:id="clmnTasksDone" prefWidth="51.0" text="Готово" />
         </columns>
       </TableView>

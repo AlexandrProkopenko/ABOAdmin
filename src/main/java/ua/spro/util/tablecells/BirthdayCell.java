@@ -1,4 +1,4 @@
-package ua.spro.util;
+package ua.spro.util.tablecells;
 
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.ContentDisplay;
