@@ -59,7 +59,7 @@ public class StatisticModel implements StatisticModelInterface {
         timeFrom = LocalTime.of(00,00,0);
         timeTo = LocalTime.of(23,59,59);
         System.out.println(timeFrom + "   " + timeTo);
-        if(user.getUserId() == -1){
+        if(user.getLogin().equals("Всі")){
             dataList.addAll( actionStatisticService.getDataByDate( LocalDateTime.of(from, timeFrom) , LocalDateTime.of(to, timeTo)) );
         }else {
             dataList.addAll(actionStatisticService.getDataByUserIdAndDate(user.getUserId(), LocalDateTime.of(from, timeFrom), LocalDateTime.of(to, timeTo)));

@@ -374,8 +374,100 @@ public class ClientDAOImpl implements ClientDAO, Observer {
     public ObservableList<Client> getClientsByFilters(Status status, Department department,
                                                       LocalDate dateFrom, LocalDate dateTo, TaskSelectType taskSelectType, User author, User executor) {
 
+        ObservableList<Client> list = FXCollections.observableArrayList();
 
-        return null;
+        if(department == null || status == null)
+            return list;
+
+        try(Connection c = DriverManager.getConnection(url, login, password)) {
+            StringBuilder query = new StringBuilder("select\n" +
+                    "cl.client_id, cl.child_name, cl.birthday, cl.parent_name, cl.phone, cl.location, cl.department_id, cl.status_id,\n" +
+                    "t.end_date, t.done, h.user_id, t.executor_id\n" +
+                    "\n" +
+                    "from clients cl\n" +
+                    "join clients_history ch\n" +
+                    "on cl.client_id = ch.client_id\n" +
+                    "left join histories h\n" +
+                    "on ch.history_id = h.history_id\n" +
+                    "join histories_tasks ht\n" +
+                    "on h.history_id = ht.history_id \n" +
+                    "left join tasks t\n" +
+                    "on ht.task_id = t.task_id\n" +
+                    "\n" +
+                    "having "
+            );
+
+            if(department.getClientDepartment().equals("Всі")){
+            }else{
+                query.append(" cl.department_id = ").
+                        append(department.getDepartmentId()).
+                        append(" and ");
+            }
+
+            if(status.getClientStatus().equals("Всі")){
+            }else{
+                query.append("cl.status_id = ").
+                        append(status.getStatusId()).
+                        append(" and ");
+            }
+
+            query.append("t.end_date >= '").
+                    append(dateFrom).
+                    append("'");
+
+            query.append(" and t.end_date <= '").
+                    append(dateTo).
+                    append("'");
+
+            switch (taskSelectType){
+                case DONE:
+                    query.append(" and t.done = true ");
+                    break;
+                case UNDONE:
+                    query.append(" and t.done = false ");
+                    break;
+                case ALL:
+                    break;
+            }
+
+            if(author.getLogin().equals("Всі")){
+            }else {
+                query.append("and h.user_id = ").
+                        append(author.getUserId());
+            }
+
+            if(executor.getLogin().equals("Всі")){
+            }else {
+                query.append(" and t.executor_id = ").
+                        append(executor.getUserId());
+            }
+            query.append(";");
+
+            System.out.println(query.toString());
+
+            PreparedStatement statement = c.prepareStatement(query.toString());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                list.add(new Client(
+                        resultSet.getInt(1),
+                        resultSet.getString(2),
+                        (resultSet.getDate(3)).toLocalDate(),
+                        resultSet.getString(4),
+                        resultSet.getString(5),
+                        resultSet.getString(6),
+                        resultSet.getInt(7),
+                        resultSet.getInt(8)
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("inDao");
+        for(Client n: list){
+            System.out.println(n);
+        }
+        return list;
     }
 
     @Override

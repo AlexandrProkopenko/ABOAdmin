@@ -18,6 +18,7 @@ import java.util.Formatter;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import ua.spro.entity.User;
+import ua.spro.entity.save.StatisticSavedSettings;
 import ua.spro.entity.statistic.ActionStatistic;
 import ua.spro.model.statistic.StatisticModel;
 import ua.spro.model.statistic.StatisticModelInterface;
@@ -31,9 +32,11 @@ public class StatisticController {
     private UserModelInterface userModel;
     private ObservableList<User> users;
     private User currentUser;
+    private User filterUser;
     private User allUsers;
     private LocalDate dateFrom;
     private LocalDate dateTo;
+    private StatisticSavedSettings currentStatisticSavedSettings;
 
     @FXML private TableView<ActionStatistic> tblStatistic;
 
@@ -81,7 +84,31 @@ public class StatisticController {
         dataSetup();
         tableSetup();
         choiseBoxSetup();
+        loadSettings();
         ABOAdminApp.statisticController = this;
+    }
+
+    public void saveSettings(){
+        currentStatisticSavedSettings.setDateFrom(dpFrom.getValue());
+        currentStatisticSavedSettings.setDateTo(dpTo.getValue());
+        currentStatisticSavedSettings.setUserId(chbUser.getValue().getUserId());
+    }
+
+    public void loadSettings(){
+        if (currentUser != null){
+            currentStatisticSavedSettings = currentUser.getSavedSettings().getStatisticSavedSettings();
+        }else {
+            currentStatisticSavedSettings = new StatisticSavedSettings();
+        }
+        System.out.println("Loading Statistic settings for current user\n");
+        System.out.println(currentStatisticSavedSettings + "\n");
+
+//        dateTo = currentStatisticSavedSettings.getDateTo();
+        dateFrom = currentStatisticSavedSettings.getDateFrom();
+        filterUser = users.get(currentStatisticSavedSettings.getUserId()-1);
+        dpFrom.setValue(dateFrom);
+        chbUser.setValue(filterUser);
+        statisticModel.getData(filterUser, dateFrom, dateTo);
     }
 
     private void choiseBoxSetup(){
@@ -90,8 +117,9 @@ public class StatisticController {
         chbUser.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                currentUser = chbUser.getValue();
-                statisticModel.getData(currentUser, dateFrom, dateTo);
+                filterUser = chbUser.getValue();
+                statisticModel.getData(filterUser, dateFrom, dateTo);
+                saveSettings();
             }
         });
 
@@ -100,11 +128,12 @@ public class StatisticController {
             @Override
             public void handle(ActionEvent event) {
                 dateFrom = dpFrom.getValue();
-                if(currentUser == allUsers){
+                if(filterUser == allUsers){
                     statisticModel.getData(dateFrom, dateTo);
                 }else {
-                    statisticModel.getData(currentUser, dateFrom, dateTo);
+                    statisticModel.getData(filterUser, dateFrom, dateTo);
                 }
+                saveSettings();
             }
         });
 
@@ -113,11 +142,12 @@ public class StatisticController {
             @Override
             public void handle(ActionEvent event) {
                 dateTo = dpTo.getValue();
-                if(currentUser == allUsers){
+                if(filterUser == allUsers){
                     statisticModel.getData(dateFrom, dateTo);
                 }else {
-                    statisticModel.getData(currentUser, dateFrom, dateTo);
+                    statisticModel.getData(filterUser, dateFrom, dateTo);
                 }
+                saveSettings();
             }
         });
     }
@@ -129,9 +159,14 @@ public class StatisticController {
 
         users = userModel.getAllUsers();
         currentUser = userModel.getCurrentUser();
-        allUsers = new User(-1, "Всі", "");
-        currentUser = allUsers;
-        users.add(allUsers);
+//        allUsers = new User(-1, "Всі", "");
+//        currentUser = allUsers;
+//        users.add(allUsers);
+        for(User u: users){
+            if(u.getLogin().equals("Всі")){
+                filterUser = allUsers = u;
+            }
+        }
 
         dateTo = StatisticModel.MAX_DATE.toLocalDate();
         dateFrom = StatisticModel.MIN_DATE.toLocalDate();
@@ -194,10 +229,10 @@ public class StatisticController {
     }
 
     public void refresh(){
-        if(currentUser == allUsers){
+        if(filterUser == allUsers){
             statisticModel.getData(dateFrom, dateTo);
         }else {
-            statisticModel.getData(currentUser, dateFrom, dateTo);
+            statisticModel.getData(filterUser, dateFrom, dateTo);
         }
     }
 }

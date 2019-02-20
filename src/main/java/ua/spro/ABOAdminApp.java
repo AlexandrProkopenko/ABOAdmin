@@ -1,12 +1,14 @@
 package ua.spro;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import ua.spro.controller.MainController;
 import ua.spro.controller.SettingsController;
 import ua.spro.controller.main.AdminController;
@@ -84,7 +86,14 @@ public class ABOAdminApp extends Application {
 //        mainController.setMainStage(mainStage);
         mainStage.setMinWidth(1200);
         mainStage.setMinHeight(650);
-
+        mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                userModel.saveUserToFile(userModel.getCurrentUser());
+                System.out.println(userModel.getCurrentUser().getSavedSettings());
+                System.out.println("Settaings are saved on exit");
+            }
+        });
 
 
 
@@ -113,8 +122,6 @@ public class ABOAdminApp extends Application {
         mainStage.show();
 
 
-        settingsStage.setOnCloseRequest(event -> {
-//            mainController.
-        });
+
     }
 }

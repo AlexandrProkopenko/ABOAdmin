@@ -96,7 +96,7 @@ public class UserModel extends Observable implements UserModelInterface  {
         }
     }
 
-    private boolean saveUserToFile(User user){
+    public boolean saveUserToFile(User user){
         try (FileOutputStream fos = new FileOutputStream(file)) {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(user);
@@ -144,9 +144,6 @@ public class UserModel extends Observable implements UserModelInterface  {
 
     @Override
     public Integer save(User user) {
-
-
-
         return userService.save(user);
     }
 

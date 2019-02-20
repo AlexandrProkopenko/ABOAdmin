@@ -17,6 +17,8 @@ import ua.spro.controller.main.StatisticController;
 import ua.spro.controller.users.InUserSceneController;
 import ua.spro.controller.users.NewUserSceneController;
 import ua.spro.controller.users.NoUserSceneController;
+import ua.spro.entity.save.SavedSettings;
+import ua.spro.entity.save.Screen;
 import ua.spro.model.admin.AdminModel;
 import ua.spro.model.admin.AdminModelInterface;
 import ua.spro.model.user.UserModel;
@@ -66,6 +68,9 @@ public class MainController implements Observer {
     private UserModel userModel;
     private AdminModelInterface adminModel;
     private ReadExcelUtil excelUtil;
+
+    private SavedSettings currentSavedSettings;
+    private Screen currentScreen;
     
 
     //  subscene for changing user authorization
@@ -74,6 +79,7 @@ public class MainController implements Observer {
     @FXML private AnchorPane mainAnchorPane;
     @FXML private ToggleButton btnAdminScene;
     @FXML private ToggleButton btnVisitScene;
+    @FXML private ToggleButton btnStatisticScene;
     @FXML private MenuItem miImportExcel;
 
 
@@ -89,6 +95,33 @@ public class MainController implements Observer {
         excelUtil = new ReadExcelUtil( userModel);
 //Версія для колег
 //        miImportExcel.setDisable(true);
+        loadSettings();
+    }
+
+    public void saveSettings(){
+       currentSavedSettings.setScreen(currentScreen);
+    }
+
+    public void loadSettings(){
+        if (userModel.getCurrentUser() != null){
+            currentSavedSettings = userModel.getCurrentUser().getSavedSettings();
+        }else {
+            currentSavedSettings = new SavedSettings();
+        }
+        currentScreen = currentSavedSettings.getScreen();
+        switch (currentScreen){
+            case ADMIN_SCENE:
+                btnAdminOnAction();
+                btnAdminScene.setSelected(true);
+                break;
+            case STATISTIC_SCENE:
+                btnSttstcOnActon();
+                btnStatisticScene.setSelected(true);
+                break;
+            case VISIT_SCENE:
+                btnStatisticScene.setSelected(true);
+                break;
+        }
     }
 
     private void modelsSetup(){
@@ -166,8 +199,8 @@ public class MainController implements Observer {
             subScene.setHeight(mainAnchorPane.getHeight()- (subScene.getLayoutY()));
         });
         subScene.widthProperty().bind(mainAnchorPane.widthProperty());
-        btnAdminScene.setSelected(true);
-        btnAdminOnAction();
+//        btnAdminScene.setSelected(true);
+//        btnAdminOnAction();
     }
 
     public void miSettingsOnAction(){
@@ -210,13 +243,22 @@ public class MainController implements Observer {
     }
 
     public void btnAdminOnAction(){
+        currentScreen = Screen.ADMIN_SCENE;
+        saveSettings();
         subScene.setRoot(adminRoot);
     }
 
     public void btnSttstcOnActon(){
+        currentScreen = Screen.STATISTIC_SCENE;
+        saveSettings();
         statisticController.refresh();
         subScene.setRoot(statisticRoot);
 
+    }
+
+    public void btnVisitSceneOnAction(){
+        currentScreen = Screen.VISIT_SCENE;
+        saveSettings();
     }
 
     @Override
