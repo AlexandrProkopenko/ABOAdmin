@@ -16,7 +16,7 @@ public class StatisticModel implements StatisticModelInterface {
 
    private ObservableList<ActionStatistic> dataList;
    private ActionStatisticService actionStatisticService;
-   public final static LocalDateTime MIN_DATE = LocalDateTime.of(2018,10, 1, 0, 0);
+   public final static LocalDateTime MIN_DATE = LocalDateTime.of(2019,1, 1, 0, 0);
    public final static LocalDateTime MAX_DATE = LocalDateTime.now();
 
     public StatisticModel() {

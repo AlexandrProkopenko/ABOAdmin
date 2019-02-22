@@ -30,6 +30,7 @@ import ua.spro.entity.save.FilterDate;
 import ua.spro.entity.task.TaskExt;
 import ua.spro.entity.task.TaskSelectType;
 import ua.spro.model.admin.AdminModelInterface;
+import ua.spro.model.update.UpdateModelInterface;
 import ua.spro.model.user.UserModelInterface;
 import ua.spro.util.tablecells.BooleanCell;
 
@@ -64,7 +65,7 @@ public class AdminController {
 
 //    set task parameters
 
-    @FXML private CheckBox chekboxSetTask;
+//    @FXML private CheckBox checkboxSetTask;
     @FXML private DatePicker dpSetTaskDateTo;
     @FXML private ChoiceBox<User> chbSetTaskExecutor;
 // filtration tasks of current client
@@ -157,6 +158,10 @@ public class AdminController {
     private boolean datePickerFlag = false;
     private boolean choiseboxFlag = false;
 
+    private UpdateModelInterface updateModel;
+    private Thread updatingThread;
+
+
     private AdminSavedSettings currentAdminSavedSettings;
 
     private MainController mainController;
@@ -174,8 +179,11 @@ public class AdminController {
     public void initialize(){
             adminModel = ABOAdminApp.getAdminModel();
             userModel = ABOAdminApp.getUserModel();
+            updateModel = ABOAdminApp.getUpdateModel();
             currentUser = userModel.getCurrentUser();
             users = userModel.getAllUsers();
+
+
 
         dataSetup();
         clientTableSetup();
@@ -187,6 +195,7 @@ public class AdminController {
 
 
         ABOAdminApp.adminController = this;
+        updatingInfo();
         System.out.println("setUp compleeted!");
     }
 
@@ -306,7 +315,12 @@ public class AdminController {
         chbDepartments.setValue(filterDepartment);
 
         System.out.println("get clients by filters after loading controlls state");
-        adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        if(checkboxTask.isSelected()) {
+            adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo, taskSelectTypeClient, authorFilter, executorFilter);
+        }else {
+            adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+        }
+        updateModel.unitIsUpdated();
     }
 
     private void taskControlsInit(){
@@ -444,6 +458,7 @@ public class AdminController {
                 }
                 authorFilter = chbTaskAuthor.getValue();
                 adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+                updateModel.unitIsUpdated();
                 saveSettings();
             }
         });
@@ -458,6 +473,7 @@ public class AdminController {
                 }
                 executorFilter = chbTaskExecutor.getValue();
                 adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+                updateModel.unitIsUpdated();
                 saveSettings();
             }
         });
@@ -565,6 +581,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setChildName(newNameValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+                updateModel.newInfoAdded();
             }
         });
         clmnContactsChildName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
@@ -590,7 +607,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setAge(newAgeValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
-
+                updateModel.newInfoAdded();
 //                tblViewClients.refresh();
             }
         });
@@ -618,7 +635,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setBirthday(newDateValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
-
+                updateModel.newInfoAdded();
 //                tblViewClients.refresh();
 
             }
@@ -634,6 +651,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setParentName(newParentValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
+                updateModel.newInfoAdded();
             }
         });
         clmnContactsParentName.prefWidthProperty().bind(tblViewClients.widthProperty().divide(6)); // w * 1/4 ширина
@@ -649,7 +667,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setPhone(newPhoneValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
-
+                updateModel.newInfoAdded();
             }
         });
         clmnContactsLocation.setCellValueFactory(new PropertyValueFactory<Client, String>("location"));
@@ -663,7 +681,7 @@ public class AdminController {
                 Client newValue = new Client(oldValue);
                 newValue.setLocation(newLocationValue);
                 adminModel.editClient(oldValue, newValue, userModel.getCurrentUser());
-
+                updateModel.newInfoAdded();
             }
         });
 
@@ -789,7 +807,7 @@ public class AdminController {
                         event.getNewValue(),
                         userModel.getCurrentUser()
                 );
-
+                updateModel.newInfoAdded();
             }
         });
 
@@ -894,6 +912,7 @@ public class AdminController {
                 }else {
                     adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
                 }
+                updateModel.unitIsUpdated();
                 saveSettings();
 
             }
@@ -955,19 +974,19 @@ public class AdminController {
 
 
 
-    private void chbDepartmentsOnAction(){
-
-        currentDepartment = chbDepartments.getValue() ;
-        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
-
-    }
-
-    private void chbStatusesOnAction(){
-
-        currentStatus = chbStatuses.getValue() ;
-        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
-
-    }
+//    private void chbDepartmentsOnAction(){
+//
+//        currentDepartment = chbDepartments.getValue() ;
+//        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+//
+//    }
+//
+//    private void chbStatusesOnAction(){
+//
+//        currentStatus = chbStatuses.getValue() ;
+//        adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+//
+//    }
 
     public void btnSaveContactOnAction(){
         Client newClient;
@@ -1005,7 +1024,9 @@ public class AdminController {
             newClient = new Client(name,birthday, parentName, phone, location,  departmentId, statusId);
 
             adminModel.saveClient(newClient, userModel.getCurrentUser());
+            updateModel.newInfoAdded();
             adminModel.getClientsByStatusAndDepartment(newStatus, newDepartment);
+            updateModel.unitIsUpdated();
 //            clientService.save(newClient);
 //            clientsList = clientService.getAll();
 //            tblViewClients.setItems(clientsList);
@@ -1020,14 +1041,16 @@ public class AdminController {
     public void btnAddHistoryOnAction(){
        String newComment = txtAreaNewComment.getText();
            if (!newComment.equals("") && currentClient != null) {
-               if(!chekboxSetTask.isSelected()) {
+               if(!checkboxSetTask.isSelected()) {
                adminModel.addComment(currentClient, newComment, userModel.getCurrentUser());
+               updateModel.newInfoAdded();
                }else {
                    System.out.println("Create new Task");
                    User executor = chbSetTaskExecutor.getValue();
                    LocalDate dateTo = dpSetTaskDateTo.getValue();
                    if(executor != null && dateTo != null) {
                        adminModel.addTask(currentClient, newComment, userModel.getCurrentUser(), executor, dateTo);
+                       updateModel.newInfoAdded();
                    }else {
                        System.out.println("Fill all inputs!");
                    }
@@ -1081,7 +1104,9 @@ public class AdminController {
                         newStatus,
                         userModel.getCurrentUser()
                 );
+                updateModel.newInfoAdded();
                 adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                updateModel.unitIsUpdated();
                 Platform.runLater(new Runnable()
                 {
                     @Override
@@ -1125,7 +1150,9 @@ public class AdminController {
                         newDepartment,
                         userModel.getCurrentUser()
                 );
+                updateModel.newInfoAdded();
                 adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+                updateModel.unitIsUpdated();
                 tblViewClients.getSelectionModel().select(currentClient);
             }else {
 
@@ -1209,6 +1236,7 @@ public class AdminController {
     public void tgbAllClientOnAction(ActionEvent event) {
         taskSelectTypeClient = TaskSelectType.ALL;
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1216,6 +1244,7 @@ public class AdminController {
     public void tgbDoneClientOnAction(ActionEvent event) {
         taskSelectTypeClient = TaskSelectType.DONE;
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1223,6 +1252,7 @@ public class AdminController {
     public void tgbUndoneClientOnAction(ActionEvent event) {
         taskSelectTypeClient = TaskSelectType.UNDONE;
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1260,6 +1290,7 @@ public class AdminController {
         dpTaskDateTo.setValue(dateFrom);
 //        get  new info
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1274,6 +1305,7 @@ public class AdminController {
         dpTaskDateTo.setValue(dateTo);
         //        get  new info
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1288,6 +1320,7 @@ public class AdminController {
         dpTaskDateTo.setValue(dateTo);
         //        get  new info
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1300,6 +1333,7 @@ public class AdminController {
         }
 //        System.out.println(event.);
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1311,6 +1345,7 @@ public class AdminController {
             return;
         }
         adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        updateModel.unitIsUpdated();
         saveSettings();
     }
 
@@ -1321,7 +1356,50 @@ public class AdminController {
         }else {
             adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
         }
+        updateModel.unitIsUpdated();
         saveSettings();
+    }
+
+    private void update(){
+        if(checkboxTask.isSelected()){
+            adminModel.getClientsByFilters(filterStatus, filterDepartment, dateFrom, dateTo,taskSelectTypeClient, authorFilter, executorFilter);
+        }else {
+            adminModel.getClientsByStatusAndDepartment(filterStatus, filterDepartment);
+        }
+        if(currentClient != null){
+            adminModel.getHistoriesByClient(currentClient);
+            adminModel.getTasksForCurrentHistoriesList(taskSelectType);
+            currentHistory = historiesList.get(0);
+
+            if (currentHistory != null) {
+                currentTooltip.setText(currentHistory.getComment());
+            }
+        }
+    }
+
+    public void updatingInfo(){
+
+
+        updatingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (updateModel.getUpdating()){
+
+                    if(updateModel.needUpdate()){
+                        update();
+                        updateModel.unitIsUpdated();
+                    }
+                    try {
+                        Thread.sleep(10_000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        updateModel.setUpdatingThread(updatingThread);
+        updatingThread.start();
+
     }
 
 }

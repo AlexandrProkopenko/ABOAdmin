@@ -1,5 +1,5 @@
-#create database if not exists abo;
-#use abo;
+#create database abo if not exists;
+# use abo;
 
 create table departments
 (
@@ -21,7 +21,7 @@ insert into users values(null, 'Orest', 'orest');
 insert into users values(null, 'Eva', 'eva');
 insert into users values(null, 'Love', 'love');
 insert into users values(null, 'Marina', 'marina');
-insert into users values(null, 'Sasha St', 'sasha');
+insert into users values(null, 'Всі', 'null');
 
 create table histories
 (
@@ -74,6 +74,18 @@ create table clients_history
   foreign key (history_id) references histories (history_id)
 );
 
+insert into statuses values(null, 'Новий');
+insert into statuses values(null, 'Цікавляться');
+insert into statuses values(null, 'Будуть на МК');
+insert into statuses values(null, 'Були на МК');
+insert into statuses values(null, 'Навчаються');
+insert into statuses values(null, 'Старички');
+insert into statuses values(null, 'Ходили раніше');
+insert into statuses values(null, 'Відмовились');
+insert into statuses values(null, 'Всі');
+
+
+
 create table tasks
 (
   task_id     int auto_increment primary key,
@@ -93,15 +105,10 @@ create table histories_tasks
   foreign key (task_id) references tasks (task_id)
 );
 
-insert into statuses values(null, 'Новий');
-insert into statuses values(null, 'Цікавляться');
-insert into statuses values(null, 'Будуть на МК');
-insert into statuses values(null, 'Були на МК');
-insert into statuses values(null, 'Навчаються');
-insert into statuses values(null, 'Старички');
-insert into statuses values(null, 'Ходили раніше');
-insert into statuses values(null, 'Пасивний');
-insert into statuses values(null, 'Відмовились');
-insert into statuses values(null, 'Всі');
-
-
+# use abo;
+create table connected_units
+(
+  unit_id int auto_increment primary key,
+  unit_name varchar(30)     null,
+  updated boolean null
+);

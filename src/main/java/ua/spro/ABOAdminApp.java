@@ -17,6 +17,8 @@ import ua.spro.model.admin.AdminModel;
 import ua.spro.model.admin.AdminModelInterface;
 import ua.spro.model.statistic.StatisticModel;
 import ua.spro.model.statistic.StatisticModelInterface;
+import ua.spro.model.update.UpdateModel;
+import ua.spro.model.update.UpdateModelInterface;
 import ua.spro.model.user.UserModel;
 import ua.spro.model.user.UserModelInterface;
 
@@ -37,7 +39,11 @@ public class ABOAdminApp extends Application {
     private static UserModel userModel;
     private static AdminModelInterface adminModel;
     private static StatisticModelInterface statisticModel;
+    private static UpdateModelInterface updateModel;
 
+    public static UpdateModelInterface getUpdateModel() {
+        return updateModel;
+    }
 
     public static UserModel getUserModel() {
         return userModel;
@@ -71,6 +77,7 @@ public class ABOAdminApp extends Application {
         userModel = new UserModel();
         adminModel = new AdminModel();
         statisticModel = new StatisticModel();
+        updateModel = new UpdateModel();
     }
 
     private void createMainForm(Stage primaryStage) throws Exception{
@@ -92,6 +99,8 @@ public class ABOAdminApp extends Application {
                 userModel.saveUserToFile(userModel.getCurrentUser());
                 System.out.println(userModel.getCurrentUser().getSavedSettings());
                 System.out.println("Settaings are saved on exit");
+
+                updateModel.onExit();
             }
         });
 
